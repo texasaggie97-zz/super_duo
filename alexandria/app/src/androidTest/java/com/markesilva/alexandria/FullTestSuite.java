@@ -1,4 +1,4 @@
-package it.jaschke.alexandria;
+package com.markesilva.alexandria;
 
 import android.test.suitebuilder.TestSuiteBuilder;
 

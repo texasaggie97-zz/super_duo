@@ -1,4 +1,4 @@
-package it.jaschke.alexandria;
+package com.markesilva.alexandria;
 
 import android.app.Activity;
 import android.content.Context;
@@ -20,9 +20,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-import it.jaschke.alexandria.data.AlexandriaContract;
-import it.jaschke.alexandria.services.BookService;
-import it.jaschke.alexandria.services.DownloadImage;
+import com.markesilva.alexandria.data.AlexandriaContract;
+import com.markesilva.alexandria.services.BookService;
+import com.markesilva.alexandria.services.DownloadImage;
 
 
 public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {

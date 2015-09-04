@@ -1,4 +1,4 @@
-package it.jaschke.alexandria;
+package com.markesilva.alexandria;
 
 import android.app.Activity;
 import android.database.Cursor;
@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,9 +14,9 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 
-import it.jaschke.alexandria.api.BookListAdapter;
-import it.jaschke.alexandria.api.Callback;
-import it.jaschke.alexandria.data.AlexandriaContract;
+import com.markesilva.alexandria.api.BookListAdapter;
+import com.markesilva.alexandria.api.Callback;
+import com.markesilva.alexandria.data.AlexandriaContract;
 
 
 public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {

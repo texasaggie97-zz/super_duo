@@ -1,4 +1,4 @@
-package it.jaschke.alexandria.CameraPreview;
+package com.markesilva.alexandria.CameraPreview;
 
 /*
  * Barebones implementation of displaying camera preview.

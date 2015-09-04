@@ -1,4 +1,4 @@
-package it.jaschke.alexandria.data;
+package com.markesilva.alexandria.data;
 
 /**
  * Created by saj on 22/12/14.
@@ -7,7 +7,6 @@ package it.jaschke.alexandria.data;
 import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
-import android.util.Log;
 
 public class AlexandriaContract{
 

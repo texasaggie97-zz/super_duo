@@ -1,4 +1,4 @@
-package it.jaschke.alexandria.api;
+package com.markesilva.alexandria.api;
 
 
 import android.content.Context;
@@ -10,9 +10,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import it.jaschke.alexandria.R;
-import it.jaschke.alexandria.data.AlexandriaContract;
-import it.jaschke.alexandria.services.DownloadImage;
+import com.markesilva.alexandria.R;
+import com.markesilva.alexandria.data.AlexandriaContract;
+import com.markesilva.alexandria.services.DownloadImage;
 
 /**
  * Created by saj on 11/01/15.

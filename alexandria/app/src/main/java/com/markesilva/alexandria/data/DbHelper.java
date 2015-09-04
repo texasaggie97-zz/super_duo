@@ -1,4 +1,4 @@
-package it.jaschke.alexandria.data;
+package com.markesilva.alexandria.data;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
