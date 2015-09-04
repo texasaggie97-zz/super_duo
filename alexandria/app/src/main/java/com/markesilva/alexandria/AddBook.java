@@ -157,6 +157,10 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
     @Override
     public void onLoadFinished(android.support.v4.content.Loader<Cursor> loader, Cursor data) {
+        if (data == null) {
+            return;
+        }
+
         if (!data.moveToFirst()) {
             return;
         }
