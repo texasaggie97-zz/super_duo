@@ -33,10 +33,10 @@ public class BookService extends IntentService {
 
     private final String LOG_TAG = BookService.class.getSimpleName();
 
-    public static final String FETCH_BOOK = "it.jaschke.alexandria.services.action.FETCH_BOOK";
-    public static final String DELETE_BOOK = "it.jaschke.alexandria.services.action.DELETE_BOOK";
+    public static final String FETCH_BOOK = "com.markesilva.alexandria.services.action.FETCH_BOOK";
+    public static final String DELETE_BOOK = "com.markesilva.alexandria.services.action.DELETE_BOOK";
 
-    public static final String EAN = "it.jaschke.alexandria.services.extra.EAN";
+    public static final String EAN = "com.markesilva.alexandria.services.extra.EAN";
 
     public BookService() {
         super("Alexandria");
