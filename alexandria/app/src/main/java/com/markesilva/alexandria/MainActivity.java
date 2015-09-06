@@ -17,10 +17,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.markesilva.alexandria.api.Callback;
+import com.markesilva.alexandria.api.BookItemCallback;
 
 
-public class MainActivity extends ActionBarActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks, Callback {
+public class MainActivity extends ActionBarActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks, BookItemCallback {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.

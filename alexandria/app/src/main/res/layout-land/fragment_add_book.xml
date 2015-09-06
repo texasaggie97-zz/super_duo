@@ -37,6 +37,21 @@
             android:layout_toRightOf="@+id/ean"
             android:layout_toEndOf="@+id/ean"/>
 
+        <com.markesilva.alexandria.CameraPreview.CameraSourcePreview
+            android:id="@+id/scanner_window"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/scan_button"
+            android:visibility="invisible">
+
+            <com.markesilva.alexandria.CameraPreview.GraphicOverlay
+                android:id="@+id/barcode_overlay"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                />
+
+        </com.markesilva.alexandria.CameraPreview.CameraSourcePreview>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

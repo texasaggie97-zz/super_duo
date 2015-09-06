@@ -10,7 +10,7 @@ import android.provider.BaseColumns;
 
 public class AlexandriaContract{
 
-    public static final String CONTENT_AUTHORITY = "com.markesilva.alexandria";
+    public static final String CONTENT_AUTHORITY = "com.markesilva.alexandria.content_provider";
 
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 

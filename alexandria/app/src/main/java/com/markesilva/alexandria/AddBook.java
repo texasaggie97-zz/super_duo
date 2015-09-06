@@ -1,9 +1,10 @@
 package com.markesilva.alexandria;
 
 import android.app.Activity;
-import android.content.Context;
+import android.app.Dialog;
 import android.content.Intent;
 import android.database.Cursor;
+import android.hardware.Camera;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -17,17 +18,29 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.vision.CameraSource;
+import com.google.android.gms.vision.MultiProcessor;
+import com.google.android.gms.vision.barcode.Barcode;
+import com.google.android.gms.vision.barcode.BarcodeDetector;
+import com.markesilva.alexandria.CameraPreview.CameraSourcePreview;
+import com.markesilva.alexandria.CameraPreview.GraphicOverlay;
+import com.markesilva.alexandria.CameraPreview.BarcodeTrackerFactory;
+import com.markesilva.alexandria.api.BarcodeResultCallback;
 import com.markesilva.alexandria.data.AlexandriaContract;
 import com.markesilva.alexandria.services.BookService;
 import com.markesilva.alexandria.services.DownloadImage;
 
+import java.io.IOException;
 
-public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, BarcodeResultCallback {
+    private static final int RC_HANDLE_GMS = 9001;
+    private static final String LOG_TAG = LOG.makeLogTag(AddBook.class);
     private static final String TAG = "INTENT_TO_SCAN_ACTIVITY";
-    private EditText ean;
+    private EditText mEan;
     private final int LOADER_ID = 1;
     private View rootView;
     private final String EAN_CONTENT="eanContent";
@@ -37,7 +50,14 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     private String mScanFormat = "Format:";
     private String mScanContents = "Contents:";
 
-
+    // Barcode scanner
+    private CameraSource mCameraSource = null;
+    private CameraSourcePreview mScannerView;
+    private GraphicOverlay mGraphicOverlay;
+    private boolean mScannerActive = false;
+    private BarcodeDetector mBarcodeDetector;
+    private Barcode mBarcode;
+    private View.OnClickListener mBarcodeClickListener;
 
     public AddBook(){
     }
@@ -45,8 +65,8 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if(ean!=null) {
-            outState.putString(EAN_CONTENT, ean.getText().toString());
+        if(mEan !=null) {
+            outState.putString(EAN_CONTENT, mEan.getText().toString());
         }
     }
 
@@ -54,9 +74,9 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         rootView = inflater.inflate(R.layout.fragment_add_book, container, false);
-        ean = (EditText) rootView.findViewById(R.id.ean);
+        mEan = (EditText) rootView.findViewById(R.id.ean);
 
-        ean.addTextChangedListener(new TextWatcher() {
+        mEan.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 //no need
@@ -69,39 +89,57 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
             @Override
             public void afterTextChanged(Editable s) {
-                String ean =s.toString();
-                //catch isbn10 numbers
-                if(ean.length()==10 && !ean.startsWith("978")){
-                    ean="978"+ean;
-                }
-                if(ean.length()<13){
-                    clearFields();
-                    return;
-                }
-                //Once we have an ISBN, start a book intent
-                Intent bookIntent = new Intent(getActivity(), BookService.class);
-                bookIntent.putExtra(BookService.EAN, ean);
-                bookIntent.setAction(BookService.FETCH_BOOK);
-                getActivity().startService(bookIntent);
-                AddBook.this.restartLoader();
+                addBook(s.toString());
             }
         });
+
+        mScannerView = (CameraSourcePreview) rootView.findViewById(R.id.scanner_window);
+        mGraphicOverlay = (GraphicOverlay) rootView.findViewById(R.id.barcode_overlay);
+
+        // Create the camera source with barcode detector
+        mBarcodeDetector = new BarcodeDetector.Builder(getContext()).build();
+        mBarcodeDetector.setProcessor(new MultiProcessor.Builder(new BarcodeTrackerFactory(mGraphicOverlay, this)).build());
+
+        if (!mBarcodeDetector.isOperational()) {
+            // The first time an app using the barcode API is installed, GMS will download a
+            // native library. Usually this is done before the app is ran
+            LOG.W(LOG_TAG, "Detector dependencies are not available yet.");
+        }
+
+        mCameraSource = new CameraSource.Builder(getContext(), mBarcodeDetector)
+                .setFacing(CameraSource.CAMERA_FACING_BACK)
+                .setRequestedFps(10.0f)
+                .build();
 
         rootView.findViewById(R.id.scan_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // This is the callback method that the system will invoke when your button is
-                // clicked. You might do this by launching another app or by including the
-                //functionality directly in this app.
-                // Hint: Use a Try/Catch block to handle the Intent dispatch gracefully, if you
-                // are using an external app.
-                //when you're done, remove the toast below.
-                Context context = getActivity();
-                CharSequence text = "This button should let you scan a book for its barcode!";
-                int duration = Toast.LENGTH_SHORT;
-
-                Toast toast = Toast.makeText(context, text, duration);
-                toast.show();
+                if (mScannerActive) {
+                    mScannerView.setVisibility(View.INVISIBLE);
+                    mScannerView.stop();
+                    mScannerView.setOnClickListener(null);
+                    mScannerActive = false;
+                } else {
+                    mScannerView.setVisibility(View.VISIBLE);
+                    startCameraSource();
+                    mScannerView.setOnClickListener(mBarcodeClickListener);
+                    mScannerActive = true;
+                    if (!mScannerView.cameraFocus(mCameraSource, Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
+                        LOG.D(LOG_TAG, "Autofocus not set!");
+                    }
+                }
+//                // This is the callback method that the system will invoke when your button is
+//                // clicked. You might do this by launching another app or by including the
+//                //functionality directly in this app.
+//                // Hint: Use a Try/Catch block to handle the Intent dispatch gracefully, if you
+//                // are using an external app.
+//                //when you're done, remove the toast below.
+//                Context context = getActivity();
+//                CharSequence text = "This button should let you scan a book for its barcode!";
+//                int duration = Toast.LENGTH_SHORT;
+//
+//                Toast toast = Toast.makeText(context, text, duration);
+//                toast.show();
 
             }
         });
@@ -109,7 +147,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         rootView.findViewById(R.id.save_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ean.setText("");
+                mEan.setText("");
             }
         });
 
@@ -117,31 +155,72 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
             @Override
             public void onClick(View view) {
                 Intent bookIntent = new Intent(getActivity(), BookService.class);
-                bookIntent.putExtra(BookService.EAN, ean.getText().toString());
+                bookIntent.putExtra(BookService.EAN, mEan.getText().toString());
                 bookIntent.setAction(BookService.DELETE_BOOK);
                 getActivity().startService(bookIntent);
-                ean.setText("");
+                mEan.setText("");
             }
         });
 
+        mBarcodeClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // If no barcode, nothing to do
+                if (mBarcode == null) {
+                    return;
+                }
+
+                mScannerView.setVisibility(View.INVISIBLE);
+                mScannerView.stop();
+                mScannerActive = false;
+
+                addBook(mBarcode.rawValue);
+            }
+        };
+
         if(savedInstanceState!=null){
-            ean.setText(savedInstanceState.getString(EAN_CONTENT));
-            ean.setHint("");
+            mEan.setText(savedInstanceState.getString(EAN_CONTENT));
+            mEan.setHint("");
         }
 
         return rootView;
     }
 
+    public void handleResult(Barcode result) {
+        mBarcode = result;
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                handleBarcode();
+            }
+        });
+    }
+
+    private void handleBarcode() {
+
+        // If no barcode, nothing to do
+        if (mBarcode == null) {
+            return;
+        }
+
+        mScannerView.setVisibility(View.INVISIBLE);
+        mScannerView.stop();
+        mScannerActive = false;
+
+        mEan.setText(mBarcode.rawValue);
+
+        addBook(mBarcode.rawValue);
+    }
     private void restartLoader(){
         getLoaderManager().restartLoader(LOADER_ID, null, this);
     }
 
     @Override
     public android.support.v4.content.Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        if(ean.getText().length()==0){
+        if(mEan.getText().length()==0){
             return null;
         }
-        String eanStr= ean.getText().toString();
+        String eanStr= mEan.getText().toString();
         if(eanStr.length()==10 && !eanStr.startsWith("978")){
             eanStr="978"+eanStr;
         }
@@ -172,9 +251,14 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         ((TextView) rootView.findViewById(R.id.bookSubTitle)).setText(bookSubTitle);
 
         String authors = data.getString(data.getColumnIndex(AlexandriaContract.AuthorEntry.AUTHOR));
-        String[] authorsArr = authors.split(",");
-        ((TextView) rootView.findViewById(R.id.authors)).setLines(authorsArr.length);
-        ((TextView) rootView.findViewById(R.id.authors)).setText(authors.replace(",","\n"));
+        if (authors != null) {
+            String[] authorsArr = authors.split(",");
+            ((TextView) rootView.findViewById(R.id.authors)).setLines(authorsArr.length);
+            ((TextView) rootView.findViewById(R.id.authors)).setText(authors.replace(",", "\n"));
+        } else {
+            ((TextView) rootView.findViewById(R.id.authors)).setLines(1);
+            ((TextView) rootView.findViewById(R.id.authors)).setText("N/A");
+        }
         String imgUrl = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.IMAGE_URL));
         if(Patterns.WEB_URL.matcher(imgUrl).matches()){
             new DownloadImage((ImageView) rootView.findViewById(R.id.bookCover)).execute(imgUrl);
@@ -208,4 +292,67 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         super.onAttach(activity);
         activity.setTitle(R.string.scan);
     }
-}
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        startCameraSource();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mScannerView.stop();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mCameraSource != null) {
+            mCameraSource.release();
+        }
+    }
+
+    private void addBook(String ean) {
+        //catch isbn10 numbers
+        if (ean.length() == 10 && !ean.startsWith("978")) {
+            ean = "978" + ean;
+        }
+        if (ean.length() < 13) {
+            clearFields();
+            return;
+        }
+        //Once we have an ISBN, start a book intent
+        Intent bookIntent = new Intent(getActivity(), BookService.class);
+        bookIntent.putExtra(BookService.EAN, ean);
+        bookIntent.setAction(BookService.FETCH_BOOK);
+        getActivity().startService(bookIntent);
+        AddBook.this.restartLoader();
+    }
+
+    /**
+     * Starts or restarts the camera source, if it exists.  If the camera source doesn't exist yet
+     * (e.g., because onResume was called before the camera source was created), this will be called
+     * again when the camera source is created.
+     */
+    private void startCameraSource() {
+
+        // check that the device has play services available.
+        int code = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(
+                getActivity());
+        if (code != ConnectionResult.SUCCESS) {
+            Dialog dlg =
+                    GoogleApiAvailability.getInstance().getErrorDialog(getActivity(), code, RC_HANDLE_GMS);
+            dlg.show();
+        }
+
+        if (mCameraSource != null) {
+            try {
+                mScannerView.start(mCameraSource, mGraphicOverlay);
+            } catch (IOException e) {
+                LOG.E(LOG_TAG, "Unable to start camera source.", e);
+                mCameraSource.release();
+                mCameraSource = null;
+            }
+        }
+    }}

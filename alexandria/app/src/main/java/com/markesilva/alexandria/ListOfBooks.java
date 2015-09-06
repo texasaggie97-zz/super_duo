@@ -15,7 +15,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 
 import com.markesilva.alexandria.api.BookListAdapter;
-import com.markesilva.alexandria.api.Callback;
+import com.markesilva.alexandria.api.BookItemCallback;
 import com.markesilva.alexandria.data.AlexandriaContract;
 
 
@@ -69,7 +69,7 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 Cursor cursor = bookListAdapter.getCursor();
                 if (cursor != null && cursor.moveToPosition(position)) {
-                    ((Callback)getActivity())
+                    ((BookItemCallback)getActivity())
                             .onItemSelected(cursor.getString(cursor.getColumnIndex(AlexandriaContract.BookEntry._ID)));
                 }
             }

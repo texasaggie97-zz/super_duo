@@ -1,6 +1,9 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" tools:context="com.markesilva.alexandria.AddBook">
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.markesilva.alexandria.AddBook">
 
     <RelativeLayout
         android:orientation="horizontal"
@@ -37,6 +40,21 @@
 
         </LinearLayout>
 
+        <com.markesilva.alexandria.CameraPreview.CameraSourcePreview
+            android:id="@+id/scanner_window"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/eancontainer"
+            android:visibility="invisible">
+
+            <com.markesilva.alexandria.CameraPreview.GraphicOverlay
+                android:id="@+id/barcode_overlay"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                />
+
+        </com.markesilva.alexandria.CameraPreview.CameraSourcePreview>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -48,7 +66,8 @@
             android:paddingRight="20dp"
             android:layout_below="@+id/eancontainer"
             android:layout_alignLeft="@+id/eancontainer"
-            android:layout_alignStart="@+id/eancontainer"/>
+            android:layout_alignStart="@+id/eancontainer"
+            tools:text="Title"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -59,6 +78,7 @@
             android:maxLines="3"
             android:ellipsize="end"
             android:layout_alignLeft="@+id/eancontainer"
+            tools:text="subtitle"
             />
 
         <TextView
@@ -71,6 +91,7 @@
             android:layout_below="@+id/bookSubTitle"
             android:layout_alignRight="@+id/eancontainer"
             android:layout_alignEnd="@+id/eancontainer"
+            tools:text="Authors"
             />
 
         <ImageView
@@ -80,7 +101,9 @@
             android:contentDescription="@string/book_cover"
             android:layout_alignTop="@+id/authors"
             android:layout_alignLeft="@+id/eancontainer"
-            android:layout_alignStart="@+id/eancontainer"/>
+            android:layout_alignStart="@+id/eancontainer"
+            tools:src="@drawable/ic_launcher"
+            />
 
         <TextView
             android:layout_width="wrap_content"
@@ -90,7 +113,9 @@
             android:layout_below="@+id/bookCover"
             android:layout_marginTop="20dp"
             android:layout_alignLeft="@+id/eancontainer"
-            android:layout_alignStart="@+id/eancontainer"/>
+            android:layout_alignStart="@+id/eancontainer"
+            tools:text="Categories"
+            />
 
         <LinearLayout
             android:orientation="horizontal"
