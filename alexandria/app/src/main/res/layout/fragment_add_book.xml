@@ -42,13 +42,14 @@
 
         <com.markesilva.alexandria.CameraPreview.CameraSourcePreview
             android:id="@+id/scanner_window"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_below="@+id/eancontainer"
-            android:layout_alignLeft="@+id/eancontainer"
-            android:layout_alignStart="@+id/eancontainer"
-            android:layout_alignRight="@+id/eancontainer"
-            android:layout_alignEnd="@+id/eancontainer"
+            android:layout_marginLeft="@dimen/scanner_margins"
+            android:layout_marginStart="@dimen/scanner_margins"
+            android:layout_marginRight="@dimen/scanner_margins"
+            android:layout_marginEnd="@dimen/scanner_margins"
+            android:layout_marginBottom="@dimen/scanner_margins"
             android:visibility="invisible"
             >
 
@@ -87,7 +88,8 @@
             android:layout_below="@+id/eancontainer"
             android:layout_alignLeft="@+id/eancontainer"
             android:layout_alignStart="@+id/eancontainer"
-            tools:text="Title"/>
+            tools:text="Title"
+            />
 
         <TextView
             android:layout_width="wrap_content"
