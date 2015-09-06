@@ -129,19 +129,6 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                         LOG.D(LOG_TAG, "Autofocus not set!");
                     }
                 }
-//                // This is the callback method that the system will invoke when your button is
-//                // clicked. You might do this by launching another app or by including the
-//                //functionality directly in this app.
-//                // Hint: Use a Try/Catch block to handle the Intent dispatch gracefully, if you
-//                // are using an external app.
-//                //when you're done, remove the toast below.
-//                Context context = getActivity();
-//                CharSequence text = "This button should let you scan a book for its barcode!";
-//                int duration = Toast.LENGTH_SHORT;
-//
-//                Toast toast = Toast.makeText(context, text, duration);
-//                toast.show();
-
             }
         });
 
