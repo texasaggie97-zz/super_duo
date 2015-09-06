@@ -47,6 +47,8 @@
             android:layout_below="@+id/eancontainer"
             android:layout_alignLeft="@+id/eancontainer"
             android:layout_alignStart="@+id/eancontainer"
+            android:layout_alignRight="@+id/eancontainer"
+            android:layout_alignEnd="@+id/eancontainer"
             android:visibility="invisible"
             >
 
