@@ -45,12 +45,8 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     private EditText mEan;
     private final int LOADER_ID = 1;
     private View rootView;
-    private final String EAN_CONTENT="eanContent";
-    private static final String SCAN_FORMAT = "scanFormat";
-    private static final String SCAN_CONTENTS = "scanContents";
-
-    private String mScanFormat = "Format:";
-    private String mScanContents = "Contents:";
+    private final String EAN_CONTENT="ean_content";
+    private final String SCANNER_STATE = "scanner_state";
 
     // Barcode scanner
     private CameraSource mCameraSource = null;
@@ -70,6 +66,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         if(mEan !=null) {
             outState.putString(EAN_CONTENT, mEan.getText().toString());
         }
+        outState.putBoolean(SCANNER_STATE, mScannerActive);
     }
 
     @Override
@@ -175,9 +172,22 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
             }
         };
 
-        if(savedInstanceState!=null){
+        if(savedInstanceState != null){
             mEan.setText(savedInstanceState.getString(EAN_CONTENT));
             mEan.setHint("");
+
+            mScannerActive = savedInstanceState.getBoolean(SCANNER_STATE);
+        }
+
+        // If the scanner was active on suspend/pause, resume it here
+        if (mScannerActive) {
+            mScannerView.setVisibility(View.VISIBLE);
+            startCameraSource();
+            mScannerView.setOnClickListener(mBarcodeClickListener);
+            mScannerActive = true;
+            if (!mScannerView.cameraFocus(mCameraSource, Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
+                LOG.D(LOG_TAG, "Autofocus not set!");
+            }
         }
 
         return rootView;
@@ -204,10 +214,10 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         mScannerView.stop();
         mScannerActive = false;
 
+        // Setting the text will trigger the afterTextChanged call back
         mEan.setText(mBarcode.rawValue);
-
-        addBook(mBarcode.rawValue);
     }
+
     private void restartLoader(){
         getLoaderManager().restartLoader(LOADER_ID, null, this);
     }
