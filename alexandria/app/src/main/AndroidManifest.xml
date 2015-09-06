@@ -36,7 +36,7 @@
 
         <provider
             android:name="com.markesilva.alexandria.data.BookProvider"
-            android:authorities="com.markesilva.alexandria"
+            android:authorities="com.markesilva.alexandria.content_provider"
             android:exported="false" />
         <service
             android:name="com.markesilva.alexandria.services.BookService"
