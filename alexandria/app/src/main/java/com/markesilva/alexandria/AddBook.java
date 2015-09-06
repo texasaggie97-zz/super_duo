@@ -174,8 +174,6 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
         if(savedInstanceState != null){
             mEan.setText(savedInstanceState.getString(EAN_CONTENT));
-            mEan.setHint("");
-
             mScannerActive = savedInstanceState.getBoolean(SCANNER_STATE);
         }
 
