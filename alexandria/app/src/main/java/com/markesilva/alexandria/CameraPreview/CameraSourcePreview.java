@@ -28,7 +28,7 @@ import android.view.ViewGroup;
 
 import com.google.android.gms.common.images.Size;
 import com.google.android.gms.vision.CameraSource;
-import com.markesilva.alexandria.LOG;
+import com.markesilva.alexandria.utils.LOG;
 
 import java.io.IOException;
 import java.lang.annotation.Retention;

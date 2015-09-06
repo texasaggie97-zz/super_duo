@@ -23,8 +23,7 @@ import android.graphics.RectF;
 import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.barcode.Barcode;
-import com.markesilva.alexandria.LOG;
-import com.markesilva.alexandria.R;
+import com.markesilva.alexandria.utils.LOG;
 import com.markesilva.alexandria.api.BarcodeResultCallback;
 
 /**

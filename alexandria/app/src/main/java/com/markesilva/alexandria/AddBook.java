@@ -33,6 +33,8 @@ import com.markesilva.alexandria.api.BarcodeResultCallback;
 import com.markesilva.alexandria.data.AlexandriaContract;
 import com.markesilva.alexandria.services.BookService;
 import com.markesilva.alexandria.services.DownloadImage;
+import com.markesilva.alexandria.utils.LOG;
+import com.markesilva.alexandria.utils.Utility;
 
 import java.io.IOException;
 
@@ -75,6 +77,14 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
         rootView = inflater.inflate(R.layout.fragment_add_book, container, false);
         mEan = (EditText) rootView.findViewById(R.id.ean);
+
+        // If there is no network then there is no reason to set any of the rest of the UI up
+        if (!Utility.isNetworkAvailable(getActivity())) {
+            mEan.setEnabled(false);
+            rootView.findViewById(R.id.scan_button).setEnabled(false);
+            rootView.findViewById(R.id.no_network_description_text).setVisibility(View.VISIBLE);
+            return rootView;
+        }
 
         mEan.addTextChangedListener(new TextWatcher() {
             @Override
@@ -128,19 +138,6 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                         LOG.D(LOG_TAG, "Autofocus not set!");
                     }
                 }
-//                // This is the callback method that the system will invoke when your button is
-//                // clicked. You might do this by launching another app or by including the
-//                //functionality directly in this app.
-//                // Hint: Use a Try/Catch block to handle the Intent dispatch gracefully, if you
-//                // are using an external app.
-//                //when you're done, remove the toast below.
-//                Context context = getActivity();
-//                CharSequence text = "This button should let you scan a book for its barcode!";
-//                int duration = Toast.LENGTH_SHORT;
-//
-//                Toast toast = Toast.makeText(context, text, duration);
-//                toast.show();
-
             }
         });
 
@@ -302,7 +299,9 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     @Override
     public void onPause() {
         super.onPause();
-        mScannerView.stop();
+        if (mScannerView != null) {
+            mScannerView.stop();
+        }
     }
 
     @Override

@@ -42,6 +42,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/scan_button"
+            android:layout_alignLeft="@+id/ean"
+            android:layout_alignStart="@+id/ean"
+            android:layout_marginRight="23dp"
+            android:layout_marginEnd="23dp"
             android:visibility="invisible">
 
             <com.markesilva.alexandria.CameraPreview.GraphicOverlay
@@ -51,6 +55,21 @@
                 />
 
         </com.markesilva.alexandria.CameraPreview.CameraSourcePreview>
+
+        <TextView
+            android:id="@+id/no_network_description_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:layout_marginTop="25dp"
+            android:textSize="@dimen/head_line"
+            android:paddingRight="20dp"
+            android:layout_below="@+id/scan_button"
+            android:layout_alignLeft="@+id/ean"
+            android:layout_alignStart="@+id/ean"
+            android:text="@string/no_network_description"
+            android:visibility="invisible"
+            />
 
         <TextView
             android:layout_width="wrap_content"
