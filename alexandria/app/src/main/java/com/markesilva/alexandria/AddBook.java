@@ -115,6 +115,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
         mCameraSource = new CameraSource.Builder(getContext(), mBarcodeDetector)
                 .setFacing(CameraSource.CAMERA_FACING_BACK)
+                .setRequestedPreviewSize(2000, 2000)
                 .setRequestedFps(10.0f)
                 .build();
 
@@ -193,12 +194,14 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
     public void handleResult(Barcode result) {
         mBarcode = result;
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                handleBarcode();
-            }
-        });
+        if (result != null) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    handleBarcode();
+                }
+            });
+        }
     }
 
     private void handleBarcode() {
