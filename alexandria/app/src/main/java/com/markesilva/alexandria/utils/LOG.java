@@ -1,4 +1,4 @@
-package com.markesilva.alexandria;
+package com.markesilva.alexandria.utils;
 
 /**
  * Created by marke on 8/11/2015.

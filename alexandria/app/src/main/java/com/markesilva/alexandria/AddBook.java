@@ -33,6 +33,7 @@ import com.markesilva.alexandria.api.BarcodeResultCallback;
 import com.markesilva.alexandria.data.AlexandriaContract;
 import com.markesilva.alexandria.services.BookService;
 import com.markesilva.alexandria.services.DownloadImage;
+import com.markesilva.alexandria.utils.LOG;
 
 import java.io.IOException;
 
