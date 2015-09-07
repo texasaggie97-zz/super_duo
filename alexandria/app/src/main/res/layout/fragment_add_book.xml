@@ -16,7 +16,7 @@
             android:layout_width="wrap_content"
             android:id="@+id/eancontainer"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="@dimen/addbook_outside_margin"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true">
 
@@ -30,7 +30,7 @@
                 android:maxLength="@integer/ean_size"
                 android:maxLines="1"
                 android:hint="@string/input_hint"
-                android:paddingRight="20dp"/>
+                android:paddingRight="@dimen/addbook_inside_margin"/>
 
             <Button
                 android:layout_width="wrap_content"
@@ -42,13 +42,14 @@
 
         <com.markesilva.alexandria.CameraPreview.CameraSourcePreview
             android:id="@+id/scanner_window"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_below="@+id/eancontainer"
-            android:layout_alignLeft="@+id/eancontainer"
-            android:layout_alignStart="@+id/eancontainer"
-            android:layout_alignRight="@+id/eancontainer"
-            android:layout_alignEnd="@+id/eancontainer"
+            android:layout_marginLeft="@dimen/scanner_margins"
+            android:layout_marginStart="@dimen/scanner_margins"
+            android:layout_marginRight="@dimen/scanner_margins"
+            android:layout_marginEnd="@dimen/scanner_margins"
+            android:layout_marginBottom="@dimen/scanner_margins"
             android:visibility="invisible"
             >
 
@@ -61,53 +62,59 @@
         </com.markesilva.alexandria.CameraPreview.CameraSourcePreview>
 
         <TextView
+            style="@style/addbook_title_theme"
             android:id="@+id/no_network_description_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textStyle="bold"
-            android:layout_marginTop="25dp"
-            android:textSize="@dimen/head_line"
-            android:paddingRight="20dp"
+            android:layout_marginTop="@dimen/addbook_outside_margin"
             android:layout_below="@+id/eancontainer"
             android:layout_alignLeft="@+id/eancontainer"
             android:layout_alignStart="@+id/eancontainer"
+            android:layout_alignRight="@+id/eancontainer"
+            android:layout_alignEnd="@+id/eancontainer"
             android:text="@string/no_network_description"
             android:visibility="invisible"
             />
 
         <TextView
+            style="@style/addbook_title_theme"
+            android:id="@+id/bookTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/bookTitle"
-            android:textSize="@dimen/head_line"
             android:textIsSelectable="true"
-            android:textStyle="bold"
-            android:layout_marginTop="25dp"
-            android:paddingRight="20dp"
+            android:layout_marginTop="@dimen/addbook_outside_margin"
             android:layout_below="@+id/eancontainer"
             android:layout_alignLeft="@+id/eancontainer"
             android:layout_alignStart="@+id/eancontainer"
-            tools:text="Title"/>
+            android:layout_alignRight="@+id/eancontainer"
+            android:layout_alignEnd="@+id/eancontainer"
+            tools:text="Title"
+            />
 
         <TextView
+            style="@style/addbook_subtitle_theme"
+            android:id="@+id/bookSubTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/bookSubTitle"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="@dimen/addbook_inside_margin"
             android:layout_below="@+id/bookTitle"
             android:maxLines="3"
             android:ellipsize="end"
             android:layout_alignLeft="@+id/eancontainer"
+            android:layout_alignStart="@+id/eancontainer"
+            android:layout_alignRight="@+id/eancontainer"
+            android:layout_alignEnd="@+id/eancontainer"
             tools:text="subtitle"
             />
 
         <TextView
+            style="@style/addbook_authors_theme"
+            android:id="@+id/authors"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/authors"
             android:gravity="end"
-            android:textSize="@dimen/small_fontsize"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="@dimen/addbook_inside_margin"
             android:layout_below="@+id/bookSubTitle"
             android:layout_alignRight="@+id/eancontainer"
             android:layout_alignEnd="@+id/eancontainer"
@@ -126,12 +133,12 @@
             />
 
         <TextView
+            style="@style/addbook_categories_theme"
+            android:id="@+id/categories"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/categories"
-            android:textSize="@dimen/small_fontsize"
             android:layout_below="@+id/bookCover"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="@dimen/addbook_inside_margin"
             android:layout_alignLeft="@+id/eancontainer"
             android:layout_alignStart="@+id/eancontainer"
             tools:text="Categories"
@@ -140,7 +147,7 @@
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="fill_parent"
-            android:layout_height="50dip"
+            android:layout_height="@dimen/addbook_button_height"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true">

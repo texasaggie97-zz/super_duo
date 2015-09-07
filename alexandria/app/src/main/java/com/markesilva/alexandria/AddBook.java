@@ -2,6 +2,7 @@ package com.markesilva.alexandria;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.hardware.Camera;
@@ -15,6 +16,7 @@ import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -32,9 +34,9 @@ import com.markesilva.alexandria.CameraPreview.BarcodeTrackerFactory;
 import com.markesilva.alexandria.api.BarcodeResultCallback;
 import com.markesilva.alexandria.data.AlexandriaContract;
 import com.markesilva.alexandria.services.BookService;
-import com.markesilva.alexandria.services.DownloadImage;
 import com.markesilva.alexandria.utils.LOG;
 import com.markesilva.alexandria.utils.Utility;
+import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 
@@ -45,12 +47,8 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     private EditText mEan;
     private final int LOADER_ID = 1;
     private View rootView;
-    private final String EAN_CONTENT="eanContent";
-    private static final String SCAN_FORMAT = "scanFormat";
-    private static final String SCAN_CONTENTS = "scanContents";
-
-    private String mScanFormat = "Format:";
-    private String mScanContents = "Contents:";
+    private final String EAN_CONTENT="ean_content";
+    private final String SCANNER_STATE = "scanner_state";
 
     // Barcode scanner
     private CameraSource mCameraSource = null;
@@ -70,6 +68,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         if(mEan !=null) {
             outState.putString(EAN_CONTENT, mEan.getText().toString());
         }
+        outState.putBoolean(SCANNER_STATE, mScannerActive);
     }
 
     @Override
@@ -118,6 +117,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
         mCameraSource = new CameraSource.Builder(getContext(), mBarcodeDetector)
                 .setFacing(CameraSource.CAMERA_FACING_BACK)
+                .setRequestedPreviewSize(2000, 2000)
                 .setRequestedFps(10.0f)
                 .build();
 
@@ -129,14 +129,21 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                     mScannerView.stop();
                     mScannerView.setOnClickListener(null);
                     mScannerActive = false;
+                    mEan.requestFocus();
+                    InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.showSoftInput(mEan, 0);
                 } else {
                     mScannerView.setVisibility(View.VISIBLE);
                     startCameraSource();
                     mScannerView.setOnClickListener(mBarcodeClickListener);
-                    mScannerActive = true;
                     if (!mScannerView.cameraFocus(mCameraSource, Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
                         LOG.D(LOG_TAG, "Autofocus not set!");
                     }
+                    mScannerActive = true;
+                    // Hide the keyboard if it is out
+                    mEan.clearFocus();
+                    InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(mEan.getWindowToken(), 0);
                 }
             }
         });
@@ -175,9 +182,17 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
             }
         };
 
-        if(savedInstanceState!=null){
+        if(savedInstanceState != null){
             mEan.setText(savedInstanceState.getString(EAN_CONTENT));
-            mEan.setHint("");
+            mScannerActive = savedInstanceState.getBoolean(SCANNER_STATE);
+        }
+
+        // If the scanner was active on suspend/pause, resume it here
+        if (mScannerActive) {
+            mScannerView.setVisibility(View.VISIBLE);
+            startCameraSource();
+            mScannerView.setOnClickListener(mBarcodeClickListener);
+            mScannerActive = true;
         }
 
         return rootView;
@@ -185,12 +200,14 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
     public void handleResult(Barcode result) {
         mBarcode = result;
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                handleBarcode();
-            }
-        });
+        if (result != null) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    handleBarcode();
+                }
+            });
+        }
     }
 
     private void handleBarcode() {
@@ -204,10 +221,10 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         mScannerView.stop();
         mScannerActive = false;
 
+        // Setting the text will trigger the afterTextChanged call back
         mEan.setText(mBarcode.rawValue);
-
-        addBook(mBarcode.rawValue);
     }
+
     private void restartLoader(){
         getLoaderManager().restartLoader(LOADER_ID, null, this);
     }
@@ -258,8 +275,9 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         }
         String imgUrl = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.IMAGE_URL));
         if(Patterns.WEB_URL.matcher(imgUrl).matches()){
-            new DownloadImage((ImageView) rootView.findViewById(R.id.bookCover)).execute(imgUrl);
-            rootView.findViewById(R.id.bookCover).setVisibility(View.VISIBLE);
+            Picasso.with(getContext()).load(imgUrl).into((ImageView) rootView.findViewById(R.id.bookCover));
+        } else {
+            Picasso.with(getContext()).load(R.drawable.ic_launcher).into((ImageView) rootView.findViewById(R.id.bookCover));
         }
 
         String categories = data.getString(data.getColumnIndex(AlexandriaContract.CategoryEntry.CATEGORY));
@@ -348,6 +366,9 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         if (mCameraSource != null) {
             try {
                 mScannerView.start(mCameraSource, mGraphicOverlay);
+                if (!mScannerView.cameraFocus(mCameraSource, Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
+                    LOG.D(LOG_TAG, "Autofocus not set!");
+                }
             } catch (IOException e) {
                 LOG.E(LOG_TAG, "Unable to start camera source.", e);
                 mCameraSource.release();
