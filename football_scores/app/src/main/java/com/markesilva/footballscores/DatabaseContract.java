@@ -1,4 +1,4 @@
-package barqsoft.footballscores;
+package com.markesilva.footballscores;
 
 import android.content.ContentResolver;
 import android.net.Uri;
@@ -46,7 +46,7 @@ public class DatabaseContract
         }
     }
     //URI data
-    public static final String CONTENT_AUTHORITY = "barqsoft.footballscores";
+    public static final String CONTENT_AUTHORITY = "com.markesilva.footballscores";
     public static final String PATH = "scores";
     public static Uri BASE_CONTENT_URI = Uri.parse("content://"+CONTENT_AUTHORITY);
 }

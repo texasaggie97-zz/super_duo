@@ -1,4 +1,4 @@
-package barqsoft.footballscores;
+package com.markesilva.footballscores;
 
 import android.content.Intent;
 import android.os.Bundle;

@@ -1,4 +1,4 @@
-package barqsoft.footballscores;
+package com.markesilva.footballscores;
 
 /**
  * Created by yehya khaled on 3/3/2015.

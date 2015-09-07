@@ -1,4 +1,4 @@
-package barqsoft.footballscores;
+package com.markesilva.footballscores;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
