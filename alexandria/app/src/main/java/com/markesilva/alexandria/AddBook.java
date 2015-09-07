@@ -184,9 +184,6 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
             startCameraSource();
             mScannerView.setOnClickListener(mBarcodeClickListener);
             mScannerActive = true;
-            if (!mScannerView.cameraFocus(mCameraSource, Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
-                LOG.D(LOG_TAG, "Autofocus not set!");
-            }
         }
 
         return rootView;
@@ -359,6 +356,9 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         if (mCameraSource != null) {
             try {
                 mScannerView.start(mCameraSource, mGraphicOverlay);
+                if (!mScannerView.cameraFocus(mCameraSource, Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
+                    LOG.D(LOG_TAG, "Autofocus not set!");
+                }
             } catch (IOException e) {
                 LOG.E(LOG_TAG, "Unable to start camera source.", e);
                 mCameraSource.release();

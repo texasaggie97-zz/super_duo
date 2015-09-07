@@ -41,6 +41,8 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@id/eancontainer"
         android:layout_alignStart="@id/eancontainer"
+        android:layout_alignRight="@id/eancontainer"
+        android:layout_alignEnd="@id/eancontainer"
         android:layout_below="@id/eancontainer"
         android:text="@string/no_network_description"
         android:layout_marginLeft="10dp"
@@ -56,6 +58,8 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@id/eancontainer"
         android:layout_alignStart="@id/eancontainer"
+        android:layout_alignRight="@id/eancontainer"
+        android:layout_alignEnd="@id/eancontainer"
         android:layout_below="@id/eancontainer"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
@@ -69,8 +73,12 @@
         android:id="@+id/bookSubTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/bookTitle"
-        android:layout_alignStart="@+id/bookTitle"
+        android:layout_alignLeft="@+id/eancontainer"
+        android:layout_alignStart="@+id/eancontainer"
+        android:layout_alignRight="@id/eancontainer"
+        android:layout_alignEnd="@id/eancontainer"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
         android:layout_below="@+id/bookTitle"
         android:layout_marginTop="10dp"
         tools:text="subtitle" />
@@ -93,6 +101,7 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/bookCover"
         android:layout_marginLeft="25dp"
+        android:layout_marginRight="10dp"
         android:layout_alignRight="@+id/eancontainer"
         android:textSize="@dimen/small_fontsize"
         tools:text="Authors" />
@@ -142,20 +151,22 @@
 
     <com.markesilva.alexandria.CameraPreview.CameraSourcePreview
         android:id="@+id/scanner_window"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/eancontainer"
         android:layout_marginBottom="@dimen/scanner_margins"
         android:layout_marginEnd="@dimen/scanner_margins"
         android:layout_marginLeft="@dimen/scanner_margins"
         android:layout_marginRight="@dimen/scanner_margins"
         android:layout_marginStart="@dimen/scanner_margins"
-        android:visibility="invisible">
+        android:visibility="invisible"
+        >
 
         <com.markesilva.alexandria.CameraPreview.GraphicOverlay
             android:id="@+id/barcode_overlay"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
 
     </com.markesilva.alexandria.CameraPreview.CameraSourcePreview>
 
