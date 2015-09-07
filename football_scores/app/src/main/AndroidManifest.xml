@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="barqsoft.footballscores" >
+    package="com.markesilva.footballscores" >
 
     <uses-permission
         android:name="android.permission.INTERNET"
@@ -12,7 +12,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".MainActivity"
+            android:name="com.markesilva.footballscores.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,18 +22,18 @@
         </activity>
 
         <provider
-            android:name=".ScoresProvider"
-            android:authorities="barqsoft.footballscores" />
+            android:name=".data.ScoresProvider"
+            android:authorities="markesilva.footballscores" />
 
         <activity
-            android:name=".AboutActivity"
+            android:name="com.markesilva.footballscores.AboutActivity"
             android:label="About"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName="com.markesilva.footballscores.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="barqsoft.footballscores.MainActivity" />
+                android:value="com.markesilva.footballscores.MainActivity" />
         </activity>
-        <service android:name=".service.myFetchService" />
+        <service android:name="com.markesilva.footballscores.service.myFetchService" />
     </application>
 
 </manifest>

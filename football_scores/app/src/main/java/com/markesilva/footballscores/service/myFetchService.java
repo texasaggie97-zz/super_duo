@@ -1,4 +1,4 @@
-package barqsoft.footballscores.service;
+package com.markesilva.footballscores.service;
 
 import android.app.IntentService;
 import android.content.ContentValues;
@@ -22,8 +22,8 @@ import java.util.Date;
 import java.util.TimeZone;
 import java.util.Vector;
 
-import barqsoft.footballscores.DatabaseContract;
-import barqsoft.footballscores.R;
+import com.markesilva.footballscores.data.DatabaseContract;
+import com.markesilva.footballscores.R;
 
 /**
  * Created by yehya khaled on 3/2/2015.
