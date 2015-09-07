@@ -1,4 +1,4 @@
-package com.markesilva.footballscores;
+package com.markesilva.footballscores.data;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;

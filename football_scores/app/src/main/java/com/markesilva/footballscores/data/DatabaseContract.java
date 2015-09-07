@@ -1,4 +1,4 @@
-package com.markesilva.footballscores;
+package com.markesilva.footballscores.data;
 
 import android.content.ContentResolver;
 import android.net.Uri;
