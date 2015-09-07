@@ -32,9 +32,9 @@ import com.markesilva.alexandria.CameraPreview.BarcodeTrackerFactory;
 import com.markesilva.alexandria.api.BarcodeResultCallback;
 import com.markesilva.alexandria.data.AlexandriaContract;
 import com.markesilva.alexandria.services.BookService;
-import com.markesilva.alexandria.services.DownloadImage;
 import com.markesilva.alexandria.utils.LOG;
 import com.markesilva.alexandria.utils.Utility;
+import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 
@@ -266,8 +266,9 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         }
         String imgUrl = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.IMAGE_URL));
         if(Patterns.WEB_URL.matcher(imgUrl).matches()){
-            new DownloadImage((ImageView) rootView.findViewById(R.id.bookCover)).execute(imgUrl);
-            rootView.findViewById(R.id.bookCover).setVisibility(View.VISIBLE);
+            Picasso.with(getContext()).load(imgUrl).into((ImageView) rootView.findViewById(R.id.bookCover));
+        } else {
+            Picasso.with(getContext()).load(R.drawable.ic_launcher).into((ImageView) rootView.findViewById(R.id.bookCover));
         }
 
         String categories = data.getString(data.getColumnIndex(AlexandriaContract.CategoryEntry.CATEGORY));
