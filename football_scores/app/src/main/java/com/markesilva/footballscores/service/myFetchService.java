@@ -22,8 +22,8 @@ import java.util.Date;
 import java.util.TimeZone;
 import java.util.Vector;
 
-import markesilva.footballscores.DatabaseContract;
-import markesilva.footballscores.R;
+import com.markesilva.footballscores.data.DatabaseContract;
+import com.markesilva.footballscores.R;
 
 /**
  * Created by yehya khaled on 3/2/2015.
