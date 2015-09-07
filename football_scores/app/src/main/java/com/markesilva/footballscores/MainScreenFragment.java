@@ -83,6 +83,10 @@ public class MainScreenFragment extends Fragment implements LoaderManager.Loader
         }
         */
 
+        if ((cursor == null) || (cursor.getCount() == 0)) {
+            // no data yet, so don't try to do anything with the cursor
+            return;
+        }
         int i = 0;
         cursor.moveToFirst();
         while (!cursor.isAfterLast())
