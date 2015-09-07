@@ -2,6 +2,7 @@ package com.markesilva.alexandria;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.hardware.Camera;
@@ -15,6 +16,7 @@ import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -127,14 +129,21 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                     mScannerView.stop();
                     mScannerView.setOnClickListener(null);
                     mScannerActive = false;
+                    mEan.requestFocus();
+                    InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.showSoftInput(mEan, 0);
                 } else {
                     mScannerView.setVisibility(View.VISIBLE);
                     startCameraSource();
                     mScannerView.setOnClickListener(mBarcodeClickListener);
-                    mScannerActive = true;
                     if (!mScannerView.cameraFocus(mCameraSource, Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
                         LOG.D(LOG_TAG, "Autofocus not set!");
                     }
+                    mScannerActive = true;
+                    // Hide the keyboard if it is out
+                    mEan.clearFocus();
+                    InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(mEan.getWindowToken(), 0);
                 }
             }
         });
