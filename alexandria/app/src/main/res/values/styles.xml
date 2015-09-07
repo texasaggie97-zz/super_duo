@@ -14,6 +14,9 @@
     <style name="list_item_subtitle_theme" parent="list_item">
         <item name="android:textAppearance">?android:textAppearanceSmall</item>
     </style>
+    <style name="list_empty_theme" parent="AppTheme">
+        <item name="android:textAppearance">?android:textAppearanceLarge</item>
+    </style>
 
     <style name="addbook" parent="AppTheme">
         <item name="android:textAppearance">?android:textAppearanceMedium</item>

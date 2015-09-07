@@ -26,6 +26,7 @@
     <string name="share_text">A must read book: </string>
 
     <string name="no_network_description">Networking is required for Add Book functionality</string>
+    <string name="empty_book_list">No books entered. Use Scan/Add Books to add books to this list</string>
 
     <string name="about_text">This application gets book information from a Google API. All titles, cover images, and author information come from there. The original version of this app was built by Sascha Jaschke. </string>
 </resources>

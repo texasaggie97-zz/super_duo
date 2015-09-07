@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.markesilva.alexandria.api.BookListAdapter;
 import com.markesilva.alexandria.api.BookItemCallback;
@@ -23,6 +24,7 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
 
     private BookListAdapter bookListAdapter;
     private ListView bookList;
+    private TextView emptyView;
     private int position = ListView.INVALID_POSITION;
     private EditText searchText;
 
@@ -61,7 +63,9 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
         );
 
         bookList = (ListView) rootView.findViewById(R.id.listOfBooks);
+        emptyView = (TextView) rootView.findViewById(R.id.list_empty);
         bookList.setAdapter(bookListAdapter);
+        bookList.setEmptyView(emptyView);
 
         bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 

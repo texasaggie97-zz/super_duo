@@ -44,7 +44,20 @@
                   android:layout_alignRight="@id/searchButton"
                   android:layout_alignParentRight="true"
                   android:layout_alignParentStart="true"
-                  android:layout_toRightOf="@id/searchButton"/>
+                  android:layout_toRightOf="@id/searchButton"
+            />
+
+        <TextView
+            style="@style/list_empty_theme"
+            android:id="@+id/list_empty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/list_margin"
+            android:layout_marginRight="@dimen/list_margin"
+            android:layout_below="@+id/searchText"
+            android:text="@string/empty_book_list"
+            tools:text="Empty"
+            />
 
 
 
