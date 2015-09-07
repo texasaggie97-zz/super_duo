@@ -36,6 +36,7 @@
     </LinearLayout>
 
     <TextView
+        style="@style/addbook_title_theme"
         android:id="@+id/no_network_description_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -45,14 +46,12 @@
         android:layout_alignEnd="@id/eancontainer"
         android:layout_below="@id/eancontainer"
         android:text="@string/no_network_description"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        android:textSize="@dimen/head_line"
+        android:layout_marginTop="@dimen/addbook_inside_margin"
         android:textStyle="bold"
         android:visibility="invisible" />
 
     <TextView
+        style="@style/addbook_title_theme"
         android:id="@+id/bookTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -61,15 +60,12 @@
         android:layout_alignRight="@id/eancontainer"
         android:layout_alignEnd="@id/eancontainer"
         android:layout_below="@id/eancontainer"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="@dimen/addbook_inside_margin"
         android:textIsSelectable="true"
-        android:textSize="@dimen/head_line"
-        android:textStyle="bold"
         tools:text="Title" />
 
     <TextView
+        style="@style/addbook_subtitle_theme"
         android:id="@+id/bookSubTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -77,8 +73,6 @@
         android:layout_alignStart="@+id/eancontainer"
         android:layout_alignRight="@id/eancontainer"
         android:layout_alignEnd="@id/eancontainer"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
         android:layout_below="@+id/bookTitle"
         android:layout_marginTop="10dp"
         tools:text="subtitle" />
@@ -93,28 +87,30 @@
         android:contentDescription="@string/book_cover"
         android:minHeight="20dip"
         android:minWidth="20dip"
-        tools:src="@drawable/ic_launcher" />
+        tools:src="@drawable/ic_launcher"
+        />
 
     <TextView
+        style="@style/addbook_authors_theme"
         android:id="@+id/authors"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/bookCover"
-        android:layout_marginLeft="25dp"
-        android:layout_marginRight="10dp"
+        android:layout_marginLeft="@dimen/addbook_inside_margin"
+        android:layout_marginStart="@dimen/addbook_inside_margin"
         android:layout_alignRight="@+id/eancontainer"
-        android:textSize="@dimen/small_fontsize"
-        tools:text="Authors" />
+        tools:text="Authors"
+        />
 
     <TextView
+        style="@style/addbook_categories_theme"
         android:id="@+id/categories"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/bookCover"
         android:layout_alignStart="@+id/bookCover"
         android:layout_below="@+id/bookCover"
-        android:layout_marginTop="10dp"
-        android:textSize="@dimen/small_fontsize"
+        android:layout_marginTop="@dimen/addbook_inside_margin"
         tools:text="Categories" />
 
     <LinearLayout

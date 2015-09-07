@@ -5,4 +5,49 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <style name="list_item" parent="AppTheme">
+
+    </style>
+    <style name="list_item_title_theme" parent="list_item">
+        <item name="android:textAppearance">?android:textAppearanceMedium</item>
+    </style>
+    <style name="list_item_subtitle_theme" parent="list_item">
+        <item name="android:textAppearance">?android:textAppearanceSmall</item>
+    </style>
+
+    <style name="addbook" parent="AppTheme">
+        <item name="android:textAppearance">?android:textAppearanceMedium</item>
+    </style>
+    <style name="addbook_title_theme" parent="addbook">
+        <item name="android:textAppearance">?android:textAppearanceLarge</item>
+    </style>
+    <style name="addbook_subtitle_theme" parent="addbook">
+
+    </style>
+    <style name="addbook_authors_theme" parent="addbook">
+
+    </style>
+    <style name="addbook_categories_theme" parent="addbook">
+
+    </style>
+
+    <style name="book" parent="AppTheme">
+        <item name="android:textAppearance">?android:textAppearanceMedium</item>
+    </style>
+    <style name="book_title_theme" parent="book">
+        <item name="android:textAppearance">?android:textAppearanceLarge</item>
+    </style>
+    <style name="book_subtitle_theme" parent="book">
+
+    </style>
+    <style name="book_authors_theme" parent="book">
+
+    </style>
+    <style name="book_categories_theme" parent="book">
+
+    </style>
+    <style name="book_description_theme" parent="book">
+
+    </style>
+
 </resources>
