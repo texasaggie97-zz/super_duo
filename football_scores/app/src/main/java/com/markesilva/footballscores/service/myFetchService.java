@@ -5,7 +5,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,13 +23,14 @@ import java.util.Vector;
 
 import com.markesilva.footballscores.data.DatabaseContract;
 import com.markesilva.footballscores.R;
+import com.markesilva.footballscores.utils.LOG;
 
 /**
  * Created by yehya khaled on 3/2/2015.
  */
 public class myFetchService extends IntentService
 {
-    public static final String LOG_TAG = "myFetchService";
+    public static final String LOG_TAG = LOG.makeLogTag(myFetchService.class);
     public myFetchService()
     {
         super("myFetchService");
@@ -54,7 +54,7 @@ public class myFetchService extends IntentService
 
         Uri fetch_build = Uri.parse(BASE_URL).buildUpon().
                 appendQueryParameter(QUERY_TIME_FRAME, timeFrame).build();
-        //Log.v(LOG_TAG, "The url we are looking at is: "+fetch_build.toString()); //log spam
+        LOG.D(LOG_TAG, "The url we are looking at is: "+fetch_build.toString()); //log spam
         HttpURLConnection m_connection = null;
         BufferedReader reader = null;
         String JSON_data = null;
@@ -90,7 +90,7 @@ public class myFetchService extends IntentService
         }
         catch (Exception e)
         {
-            Log.e(LOG_TAG,"Exception here" + e.getMessage());
+            LOG.E(LOG_TAG,"Exception here", e);
         }
         finally {
             if(m_connection != null)
@@ -104,7 +104,7 @@ public class myFetchService extends IntentService
                 }
                 catch (IOException e)
                 {
-                    Log.e(LOG_TAG,"Error Closing Stream");
+                    LOG.E(LOG_TAG,"Error Closing Stream");
                 }
             }
         }
@@ -123,12 +123,12 @@ public class myFetchService extends IntentService
                 processJSONdata(JSON_data, getApplicationContext(), true);
             } else {
                 //Could not Connect
-                Log.d(LOG_TAG, "Could not connect to server.");
+                LOG.D(LOG_TAG, "Could not connect to server.");
             }
         }
         catch(Exception e)
         {
-            Log.e(LOG_TAG,e.getMessage());
+            LOG.E(LOG_TAG,"Error:", e);
         }
     }
     private void processJSONdata (String JSONdata,Context mContext, boolean isReal)
@@ -145,7 +145,7 @@ public class myFetchService extends IntentService
         final String SEGUNDA_DIVISION = "400";
         final String SERIE_A = "401";
         final String PRIMERA_LIGA = "402";
-        final String Bundesliga3 = "403";
+        final String BUNDESLIGA3 = "403";
         final String EREDIVISIE = "404";
 
 
@@ -196,6 +196,8 @@ public class myFetchService extends IntentService
                         League.equals(SERIE_A)             ||
                         League.equals(BUNDESLIGA1)         ||
                         League.equals(BUNDESLIGA2)         ||
+                        League.equals(BUNDESLIGA3)         ||
+                        League.equals(SEGUNDA_DIVISION)    ||
                         League.equals(PRIMERA_DIVISION)     )
                 {
                     match_id = match_data.getJSONObject(LINKS).getJSONObject(SELF).
@@ -228,8 +230,7 @@ public class myFetchService extends IntentService
                     }
                     catch (Exception e)
                     {
-                        Log.d(LOG_TAG, "error here!");
-                        Log.e(LOG_TAG,e.getMessage());
+                        LOG.E(LOG_TAG, "error here!", e);
                     }
                     Home = match_data.getString(HOME_TEAM);
                     Away = match_data.getString(AWAY_TEAM);
@@ -248,28 +249,28 @@ public class myFetchService extends IntentService
                     match_values.put(DatabaseContract.scores_table.MATCH_DAY,match_day);
                     //log spam
 
-                    //Log.v(LOG_TAG,match_id);
-                    //Log.v(LOG_TAG,mDate);
-                    //Log.v(LOG_TAG,mTime);
-                    //Log.v(LOG_TAG,Home);
-                    //Log.v(LOG_TAG,Away);
-                    //Log.v(LOG_TAG,Home_goals);
-                    //Log.v(LOG_TAG,Away_goals);
+                    LOG.D(LOG_TAG,match_id);
+                    LOG.D(LOG_TAG,mDate);
+                    LOG.D(LOG_TAG,mTime);
+                    LOG.D(LOG_TAG,Home);
+                    LOG.D(LOG_TAG,Away);
+                    LOG.D(LOG_TAG,Home_goals);
+                    LOG.D(LOG_TAG,Away_goals);
 
                     values.add(match_values);
                 }
             }
-            int inserted_data = 0;
+            int inserted_data;
             ContentValues[] insert_data = new ContentValues[values.size()];
             values.toArray(insert_data);
             inserted_data = mContext.getContentResolver().bulkInsert(
                     DatabaseContract.BASE_CONTENT_URI,insert_data);
 
-            //Log.v(LOG_TAG,"Succesfully Inserted : " + String.valueOf(inserted_data));
+            LOG.D(LOG_TAG,"Successfully Inserted: " + String.valueOf(inserted_data));
         }
         catch (JSONException e)
         {
-            Log.e(LOG_TAG,e.getMessage());
+            LOG.E(LOG_TAG,e.getMessage());
         }
 
     }

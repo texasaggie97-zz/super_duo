@@ -63,7 +63,7 @@ public class scoresAdapter extends CursorAdapter
         ViewGroup container = (ViewGroup) view.findViewById(R.id.details_fragment_container);
         if(mHolder.match_id == detail_match_id)
         {
-            //Log.v(FetchScoreTask.LOG_TAG,"will insert extraView");
+            LOG.D(LOG_TAG,"will insert extraView");
 
             container.addView(v, 0, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT
                     , ViewGroup.LayoutParams.MATCH_PARENT));
