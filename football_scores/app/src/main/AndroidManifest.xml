@@ -23,7 +23,7 @@
 
         <provider
             android:name=".data.ScoresProvider"
-            android:authorities="markesilva.footballscores" />
+            android:authorities="com.markesilva.footballscores" />
 
         <activity
             android:name="com.markesilva.footballscores.AboutActivity"
