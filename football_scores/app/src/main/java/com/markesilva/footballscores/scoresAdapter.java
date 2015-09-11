@@ -3,6 +3,8 @@ package com.markesilva.footballscores;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.drawable.PictureDrawable;
+import android.net.Uri;
 import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,8 +12,16 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.bumptech.glide.GenericRequestBuilder;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.model.StreamEncoder;
+import com.bumptech.glide.load.resource.file.FileToStreamDecoder;
+import com.caverock.androidsvg.SVG;
 import com.markesilva.footballscores.data.DatabaseContract;
 import com.markesilva.footballscores.utils.LOG;
+
+import java.io.InputStream;
 
 /**
  * Created by yehya khaled on 2/26/2015.
@@ -23,18 +33,22 @@ public class scoresAdapter extends CursorAdapter
     public static final int COL_DATE = 0;
     public static final int COL_MATCHTIME = 1;
     public static final int COL_HOME = 2;
-    public static final int COL_AWAY = 3;
-    public static final int COL_LEAGUE_NAME = 4;
-    public static final int COL_LEAGUE_CODE = 5;
-    public static final int COL_HOME_GOALS = 6;
-    public static final int COL_AWAY_GOALS =7;
-    public static final int COL_ID = 8;
-    public static final int COL_MATCHDAY = 9;
+    public static final int COL_HOME_CREST_URL = 3;
+    public static final int COL_AWAY = 4;
+    public static final int COL_AWAY_CREST_URL = 5;
+    public static final int COL_LEAGUE_NAME = 6;
+    public static final int COL_LEAGUE_CODE = 7;
+    public static final int COL_HOME_GOALS = 8;
+    public static final int COL_AWAY_GOALS =9;
+    public static final int COL_ID = 10;
+    public static final int COL_MATCHDAY = 11;
     public static final String[] SCORES_COLUMS = {
             DatabaseContract.scores_table.DATE_COL,
             DatabaseContract.scores_table.TIME_COL,
             DatabaseContract.teams_table.HOME_QUERY_TABLE_NAME + "." + DatabaseContract.teams_table.NAME_COL,
+            DatabaseContract.teams_table.HOME_QUERY_TABLE_NAME + "." + DatabaseContract.teams_table.CREST_URL_COL,
             DatabaseContract.teams_table.AWAY_QUERY_TABLE_NAME + "." + DatabaseContract.teams_table.NAME_COL,
+            DatabaseContract.teams_table.AWAY_QUERY_TABLE_NAME + "." + DatabaseContract.teams_table.CREST_URL_COL,
             DatabaseContract.leagues_table.TABLE_NAME + "." + DatabaseContract.leagues_table.NAME_COL,
             DatabaseContract.leagues_table.TABLE_NAME + "." + DatabaseContract.leagues_table.LEAGUE_CODE_COL,
             DatabaseContract.scores_table.HOME_GOALS_COL,
@@ -43,6 +57,8 @@ public class scoresAdapter extends CursorAdapter
             DatabaseContract.scores_table.MATCH_DAY,
     };
     public double detail_match_id = 0;
+
+    private GenericRequestBuilder<Uri, InputStream, SVG, PictureDrawable> mRequestBuilder;
     private String FOOTBALL_SCORES_HASHTAG = "#Football_Scores";
     public scoresAdapter(Context context,Cursor cursor,int flags)
     {
@@ -56,6 +72,20 @@ public class scoresAdapter extends CursorAdapter
         ViewHolder mHolder = new ViewHolder(mItem);
         mItem.setTag(mHolder);
         //Log.v(FetchScoreTask.LOG_TAG,"new View inflated");
+        if (mRequestBuilder == null) {
+            mRequestBuilder = Glide.with(context)
+                    .using(Glide.buildStreamModelLoader(Uri.class, context), InputStream.class)
+                    .from(Uri.class)
+                    .as(SVG.class)
+                    .transcode(new SvgDrawableTranscoder(), PictureDrawable.class)
+                    .sourceEncoder(new StreamEncoder())
+                    .cacheDecoder(new FileToStreamDecoder<>(new SvgDecoder()))
+                    .decoder(new SvgDecoder())
+                    .placeholder(R.drawable.ic_launcher)
+                    .error(R.drawable.no_icon)
+                    .animate(android.R.anim.fade_in)
+                    .listener(new SvgSoftwareLayerSetter<Uri>());
+        }
         return mItem;
     }
 
@@ -68,11 +98,16 @@ public class scoresAdapter extends CursorAdapter
         mHolder.date.setText(cursor.getString(COL_MATCHTIME));
         mHolder.score.setText(Utilies.getScores(cursor.getInt(COL_HOME_GOALS), cursor.getInt(COL_AWAY_GOALS)));
         mHolder.match_id = cursor.getDouble(COL_ID);
-        mHolder.home_crest.setImageResource(Utilies.getTeamCrestByTeamName(
-                cursor.getString(COL_HOME)));
-        mHolder.away_crest.setImageResource(Utilies.getTeamCrestByTeamName(
-                cursor.getString(COL_AWAY)
-        ));
+        Uri uri = Uri.parse(cursor.getString(COL_HOME_CREST_URL));
+        mRequestBuilder
+                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                .load(uri)
+                .into(mHolder.home_crest);
+        uri = Uri.parse(cursor.getString(COL_AWAY_CREST_URL));
+        mRequestBuilder
+                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                .load(uri)
+                .into(mHolder.away_crest);
         LOG.D(LOG_TAG, mHolder.home_name.getText() + " Vs. " + mHolder.away_name.getText() + " id " + String.valueOf(mHolder.match_id));
         LOG.D(LOG_TAG,String.valueOf(detail_match_id));
         LayoutInflater vi = (LayoutInflater) context.getApplicationContext()
