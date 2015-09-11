@@ -23,7 +23,7 @@ public class MainScreenFragment extends Fragment implements LoaderManager.Loader
 {
     public scoresAdapter mAdapter;
     public static final int SCORES_LOADER = 0;
-    private String[] fragmentdate = new String[1];
+    private String mFragmentDate;
     private int last_selected_item = -1;
 
     public MainScreenFragment()
@@ -37,8 +37,9 @@ public class MainScreenFragment extends Fragment implements LoaderManager.Loader
     }
     public void setFragmentDate(String date)
     {
-        fragmentdate[0] = date;
+        mFragmentDate = date;
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              final Bundle savedInstanceState) {
@@ -66,8 +67,8 @@ public class MainScreenFragment extends Fragment implements LoaderManager.Loader
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle)
     {
-        return new CursorLoader(getActivity(), DatabaseContract.scores_table.buildScoreWithDate(),
-                null,null,fragmentdate,null);
+        return new CursorLoader(getActivity(), DatabaseContract.scores_table.buildScoreWithDate(mFragmentDate),
+                scoresAdapter.SCORES_COLUMS, null, null, null);
     }
 
     @Override
