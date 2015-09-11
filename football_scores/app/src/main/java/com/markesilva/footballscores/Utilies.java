@@ -5,30 +5,15 @@ package com.markesilva.footballscores;
  */
 public class Utilies
 {
-    public static final int SERIE_A = 357;
-    public static final int PREMIER_LEGAUE = 354;
-    public static final int CHAMPIONS_LEAGUE = 362;
-    public static final int PRIMERA_DIVISION = 358;
-    public static final int BUNDESLIGA = 351;
-    public static String getLeague(int league_num)
+    // Being an american, I am really not sure what this is supposed to be trying to accomplish
+    public static String getMatchDay(int match_day, String league_code)
     {
-        switch (league_num)
-        {
-            case SERIE_A : return "Seria A";
-            case PREMIER_LEGAUE : return "Premier League";
-            case CHAMPIONS_LEAGUE : return "UEFA Champions League";
-            case PRIMERA_DIVISION : return "Primera Division";
-            case BUNDESLIGA : return "Bundesliga";
-            default: return "Not known League Please report";
-        }
-    }
-    public static String getMatchDay(int match_day,int league_num)
-    {
-        if(league_num == CHAMPIONS_LEAGUE)
+        final String CHAMPIONS_LEAGUE = "CL";
+        if(league_code == CHAMPIONS_LEAGUE)
         {
             if (match_day <= 6)
             {
-                return "Group Stages, Matchday : 6";
+                return "Group Stages, Matchday: 6";
             }
             else if(match_day == 7 || match_day == 8)
             {
@@ -49,19 +34,19 @@ public class Utilies
         }
         else
         {
-            return "Matchday : " + String.valueOf(match_day);
+            return "Matchday: " + String.valueOf(match_day);
         }
     }
 
-    public static String getScores(int home_goals,int awaygoals)
+    public static String getScores(int home_goals,int away_goals)
     {
-        if(home_goals < 0 || awaygoals < 0)
+        if(home_goals < 0 || away_goals < 0)
         {
             return " - ";
         }
         else
         {
-            return String.valueOf(home_goals) + " - " + String.valueOf(awaygoals);
+            return String.valueOf(home_goals) + " - " + String.valueOf(away_goals);
         }
     }
 

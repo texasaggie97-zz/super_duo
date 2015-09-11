@@ -8,6 +8,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
+import com.markesilva.footballscores.data.DatabaseContract.scores_table;
+import com.markesilva.footballscores.data.DatabaseContract.leagues_table;
+import com.markesilva.footballscores.data.DatabaseContract.teams_table;
 /**
  * Created by yehya khaled on 2/25/2015.
  */
@@ -23,25 +26,48 @@ public class ScoresProvider extends ContentProvider {
     private static final int TEAM_WITH_ID = 301;
 
     private UriMatcher muriMatcher = buildUriMatcher();
-    private static final SQLiteQueryBuilder ScoreQuery = new SQLiteQueryBuilder();
-    private static final String SCORES_BY_LEAGUE = DatabaseContract.scores_table.TABLE_NAME + "." + DatabaseContract.scores_table.LEAGUE_COL + " = ?";
-    private static final String SCORES_BY_DATE =   DatabaseContract.scores_table.TABLE_NAME + "." + DatabaseContract.scores_table.DATE_COL + " LIKE ?";
-    private static final String SCORES_BY_ID =     DatabaseContract.scores_table.TABLE_NAME + "." + DatabaseContract.scores_table.MATCH_ID + " = ?";
-    private static final String TEAM_BY_ID =       DatabaseContract.teams_table.TABLE_NAME + "." + DatabaseContract.teams_table.TEAM_ID_COL + " = ?";
-    private static final String LEAGUE_BY_ID =     DatabaseContract.leagues_table.TABLE_NAME + "." + DatabaseContract.leagues_table.LEAGUE_ID_COL + " = ?";
+    private static final String SCORES_BY_LEAGUE = scores_table.TABLE_NAME + "." + scores_table.LEAGUE_COL + " = ?";
+    private static final String SCORES_BY_DATE =   scores_table.TABLE_NAME + "." + scores_table.DATE_COL + " LIKE ?";
+    private static final String SCORES_BY_ID =     scores_table.TABLE_NAME + "." + scores_table.MATCH_ID + " = ?";
+    private static final String TEAM_BY_ID =       teams_table.TABLE_NAME + "." + teams_table.TEAM_ID_COL + " = ?";
+    private static final String LEAGUE_BY_ID =     leagues_table.TABLE_NAME + "." + leagues_table.LEAGUE_ID_COL + " = ?";
+    private static final SQLiteQueryBuilder sScoreQuery;
+    static {
+        sScoreQuery = new SQLiteQueryBuilder();
+        sScoreQuery.setTables(
+                scores_table.TABLE_NAME +
+                        " INNER JOIN " + leagues_table.TABLE_NAME +
+                        " ON " + scores_table.TABLE_NAME +
+                        "." + scores_table.LEAGUE_COL +
+                        " = " + leagues_table.TABLE_NAME +
+                        "." + leagues_table.LEAGUE_ID_COL +
+                        " INNER JOIN " + teams_table.TABLE_NAME +
+                        " " + teams_table.HOME_QUERY_TABLE_NAME +
+                        " ON " + scores_table.TABLE_NAME +
+                        "." + scores_table.HOME_COL +
+                        " = " + teams_table.HOME_QUERY_TABLE_NAME +
+                        "." + teams_table.TEAM_ID_COL +
+                        " INNER JOIN " + teams_table.TABLE_NAME +
+                        " " + teams_table.AWAY_QUERY_TABLE_NAME +
+                        " ON " + scores_table.TABLE_NAME +
+                        "." + scores_table.AWAY_COL +
+                        " = " + teams_table.AWAY_QUERY_TABLE_NAME +
+                        "." + teams_table.TEAM_ID_COL
+        );
+    }
 
 
     static UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         final String authority = DatabaseContract.CONTENT_AUTHORITY;
-        matcher.addURI(authority, DatabaseContract.scores_table.PATH, MATCHES);
-        matcher.addURI(authority, DatabaseContract.scores_table.PATH + "/" + DatabaseContract.scores_table.PATH_LEAGUE, MATCHES_WITH_LEAGUE);
-        matcher.addURI(authority, DatabaseContract.scores_table.PATH + "/" + DatabaseContract.scores_table.PATH_ID, MATCHES_WITH_ID);
-        matcher.addURI(authority, DatabaseContract.scores_table.PATH + "/" + DatabaseContract.scores_table.PATH_DATE + "/*", MATCHES_WITH_DATE);
-        matcher.addURI(authority, DatabaseContract.teams_table.PATH, TEAMS);
-        matcher.addURI(authority, DatabaseContract.teams_table.PATH + "/" + DatabaseContract.teams_table.PATH_ID + "/#", TEAM_WITH_ID);
-        matcher.addURI(authority, DatabaseContract.leagues_table.PATH, LEAGUES);
-        matcher.addURI(authority, DatabaseContract.leagues_table.PATH + "/" + DatabaseContract.leagues_table.PATH_ID + "/#", LEAGUE_WITH_ID);
+        matcher.addURI(authority, scores_table.PATH, MATCHES);
+        matcher.addURI(authority, scores_table.PATH + "/" + scores_table.PATH_LEAGUE, MATCHES_WITH_LEAGUE);
+        matcher.addURI(authority, scores_table.PATH + "/" + scores_table.PATH_ID, MATCHES_WITH_ID);
+        matcher.addURI(authority, scores_table.PATH + "/" + scores_table.PATH_DATE + "/*", MATCHES_WITH_DATE);
+        matcher.addURI(authority, teams_table.PATH, TEAMS);
+        matcher.addURI(authority, teams_table.PATH + "/" + teams_table.PATH_ID + "/#", TEAM_WITH_ID);
+        matcher.addURI(authority, leagues_table.PATH, LEAGUES);
+        matcher.addURI(authority, leagues_table.PATH + "/" + leagues_table.PATH_ID + "/#", LEAGUE_WITH_ID);
         return matcher;
     }
 
@@ -61,21 +87,21 @@ public class ScoresProvider extends ContentProvider {
         final int match = muriMatcher.match(uri);
         switch (match) {
             case MATCHES:
-                return DatabaseContract.scores_table.CONTENT_TYPE;
+                return scores_table.CONTENT_TYPE;
             case MATCHES_WITH_LEAGUE:
-                return DatabaseContract.scores_table.CONTENT_TYPE;
+                return scores_table.CONTENT_TYPE;
             case MATCHES_WITH_ID:
-                return DatabaseContract.scores_table.CONTENT_ITEM_TYPE;
+                return scores_table.CONTENT_ITEM_TYPE;
             case MATCHES_WITH_DATE:
-                return DatabaseContract.scores_table.CONTENT_TYPE;
+                return scores_table.CONTENT_TYPE;
             case TEAMS:
-                return DatabaseContract.teams_table.CONTENT_TYPE;
+                return teams_table.CONTENT_TYPE;
             case TEAM_WITH_ID:
-                return DatabaseContract.teams_table.CONTENT_ITEM_TYPE;
+                return teams_table.CONTENT_ITEM_TYPE;
             case LEAGUES:
-                return DatabaseContract.leagues_table.CONTENT_TYPE;
+                return leagues_table.CONTENT_TYPE;
             case LEAGUE_WITH_ID:
-                return DatabaseContract.leagues_table.CONTENT_ITEM_TYPE;
+                return leagues_table.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri :" + uri);
         }
@@ -91,45 +117,44 @@ public class ScoresProvider extends ContentProvider {
         switch (muriMatcher.match(uri)) {
             case MATCHES:
                 retCursor = mOpenHelper.getReadableDatabase().query(
-                        DatabaseContract.scores_table.TABLE_NAME,
+                        scores_table.TABLE_NAME,
                         projection, null, null, null, null, sortOrder);
                 break;
             case MATCHES_WITH_DATE:
                 String date = DatabaseContract.scores_table.getDateFromUri(uri);
-                retCursor = mOpenHelper.getReadableDatabase().query(
-                        DatabaseContract.scores_table.TABLE_NAME,
+                retCursor = sScoreQuery.query(mOpenHelper.getReadableDatabase(),
                         projection, SCORES_BY_DATE, new String[]{date}, null, null, sortOrder);
                 break;
             case MATCHES_WITH_ID:
                 retCursor = mOpenHelper.getReadableDatabase().query(
-                        DatabaseContract.scores_table.TABLE_NAME,
+                        scores_table.TABLE_NAME,
                         projection, SCORES_BY_ID, selectionArgs, null, null, sortOrder);
                 break;
             case MATCHES_WITH_LEAGUE:
                 retCursor = mOpenHelper.getReadableDatabase().query(
-                        DatabaseContract.scores_table.TABLE_NAME,
+                        scores_table.TABLE_NAME,
                         projection, SCORES_BY_LEAGUE, selectionArgs, null, null, sortOrder);
                 break;
             case TEAMS:
                 retCursor = mOpenHelper.getReadableDatabase().query(
-                        DatabaseContract.teams_table.TABLE_NAME,
+                        teams_table.TABLE_NAME,
                         projection, null, null, null, null, sortOrder);
                 break;
             case TEAM_WITH_ID:
                 String team = DatabaseContract.teams_table.getTeamFromUri(uri);
                 retCursor = mOpenHelper.getReadableDatabase().query(
-                        DatabaseContract.teams_table.TABLE_NAME,
+                        teams_table.TABLE_NAME,
                         projection, TEAM_BY_ID, new String[]{team}, null, null, sortOrder);
                 break;
             case LEAGUES:
                 retCursor = mOpenHelper.getReadableDatabase().query(
-                        DatabaseContract.leagues_table.TABLE_NAME,
+                        leagues_table.TABLE_NAME,
                         projection, null, null, null, null, sortOrder);
                 break;
             case LEAGUE_WITH_ID:
                 String league = DatabaseContract.leagues_table.getLeagueFromUri(uri);
                 retCursor = mOpenHelper.getReadableDatabase().query(
-                        DatabaseContract.leagues_table.TABLE_NAME,
+                        leagues_table.TABLE_NAME,
                         projection, LEAGUE_BY_ID, new String[]{league}, null, null, sortOrder);
                 break;
             default:
@@ -147,17 +172,17 @@ public class ScoresProvider extends ContentProvider {
         switch (muriMatcher.match(uri))
         {
             case TEAMS: {
-                long _id = db.insert(DatabaseContract.teams_table.TABLE_NAME, null, values);
+                long _id = db.insert(teams_table.TABLE_NAME, null, values);
                 if (_id > 0)
-                    returnUri = DatabaseContract.teams_table.buildTeamWithId(values.getAsString(DatabaseContract.teams_table.TEAM_ID_COL));
+                    returnUri = teams_table.buildTeamWithId(values.getAsString(teams_table.TEAM_ID_COL));
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             }
             case LEAGUES: {
-                long _id = db.insert(DatabaseContract.leagues_table.TABLE_NAME, null, values);
+                long _id = db.insert(leagues_table.TABLE_NAME, null, values);
                 if (_id > 0)
-                    returnUri = DatabaseContract.teams_table.buildTeamWithId(values.getAsString(DatabaseContract.leagues_table.LEAGUE_ID_COL));
+                    returnUri = teams_table.buildTeamWithId(values.getAsString(leagues_table.LEAGUE_ID_COL));
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
@@ -181,7 +206,7 @@ public class ScoresProvider extends ContentProvider {
                 int returnCount = 0;
                 try {
                     for (ContentValues value : values) {
-                        long _id = db.insertWithOnConflict(DatabaseContract.scores_table.TABLE_NAME, null, value,
+                        long _id = db.insertWithOnConflict(scores_table.TABLE_NAME, null, value,
                                 SQLiteDatabase.CONFLICT_REPLACE);
                         if (_id != -1) {
                             returnCount++;

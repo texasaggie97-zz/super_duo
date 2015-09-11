@@ -29,7 +29,8 @@ public class ScoresDBHelper extends SQLiteOpenHelper
                 + leagues_table._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + leagues_table.LEAGUE_ID_COL+ " INTEGER NOT NULL, "
                 + leagues_table.NAME_COL + " TEXT NOT NULL, "
-                + leagues_table.ENABLED_COL + " INTEGER NOT NULL,"
+                + leagues_table.ENABLED_COL + " INTEGER NOT NULL, "
+                + leagues_table.LEAGUE_CODE_COL + " STRING NOT NULL, "
                 + " UNIQUE (" + leagues_table.LEAGUE_ID_COL + ") ON CONFLICT REPLACE"
                 + " );";
 

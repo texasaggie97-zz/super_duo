@@ -257,6 +257,7 @@ public class myFetchService extends IntentService {
         private String mLeagueId;
         private final String SEASON_LINK = "http://api.football-data.org/alpha/soccerseasons/";
         private final String LEAGUE_CAPTION = "caption";
+        private final String LEAGUE_CODE = "league";
 
         AddLeagueIfNeeded(String leagueUrl, Context context) {
             mLeagueUrl = leagueUrl;
@@ -326,11 +327,13 @@ public class myFetchService extends IntentService {
                 try {
                     JSONObject league = new JSONObject(JSON_data);
                     String league_name = league.getString(LEAGUE_CAPTION);
+                    String league_code = league.getString(LEAGUE_CODE);
 
                     ContentValues cv = new ContentValues();
                     cv.put(DatabaseContract.leagues_table.LEAGUE_ID_COL, mLeagueId);
                     cv.put(DatabaseContract.leagues_table.NAME_COL, league_name);
                     cv.put(DatabaseContract.leagues_table.ENABLED_COL, "1"); // By default, all leagues are enabled when first seen
+                    cv.put(DatabaseContract.leagues_table.LEAGUE_CODE_COL, league_code);
                     Uri returnedUri = mContext.getContentResolver().insert(DatabaseContract.leagues_table.CONTENT_URI, cv);
                     LOG.D(LOG_TAG, "inserted league: " + returnedUri.toString());
                 } catch (Exception e) {

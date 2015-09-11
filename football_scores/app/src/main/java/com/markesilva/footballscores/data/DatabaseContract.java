@@ -54,6 +54,8 @@ public class DatabaseContract {
 
     public static final class teams_table implements BaseColumns {
         public static final String TABLE_NAME = "teams_table";
+        public static final String HOME_QUERY_TABLE_NAME = "home";
+        public static final String AWAY_QUERY_TABLE_NAME = "away";
         public static final String PATH = "team";
         public static final String PATH_ID = "id";
         // Table data
@@ -89,6 +91,7 @@ public class DatabaseContract {
         public static final String LEAGUE_ID_COL = "league_id";
         public static final String NAME_COL = "league_name";
         public static final String ENABLED_COL = "enabled";
+        public static final String LEAGUE_CODE_COL = "code";
 
         //Types
         public static final String CONTENT_TYPE =
