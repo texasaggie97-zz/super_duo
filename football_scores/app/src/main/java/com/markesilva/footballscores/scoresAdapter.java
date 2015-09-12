@@ -6,10 +6,12 @@ import android.database.Cursor;
 import android.graphics.drawable.PictureDrawable;
 import android.net.Uri;
 import android.support.v4.widget.CursorAdapter;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.GenericRequestBuilder;
@@ -81,9 +83,8 @@ public class scoresAdapter extends CursorAdapter
                     .sourceEncoder(new StreamEncoder())
                     .cacheDecoder(new FileToStreamDecoder<>(new SvgDecoder()))
                     .decoder(new SvgDecoder())
-                    .placeholder(R.drawable.ic_launcher)
-                    .error(R.drawable.no_icon)
                     .animate(android.R.anim.fade_in)
+                    .placeholder(R.drawable.no_icon)
                     .listener(new SvgSoftwareLayerSetter<Uri>());
         }
         return mItem;
@@ -93,21 +94,20 @@ public class scoresAdapter extends CursorAdapter
     public void bindView(View view, final Context context, Cursor cursor)
     {
         final ViewHolder mHolder = (ViewHolder) view.getTag();
-        mHolder.home_name.setText(cursor.getString(COL_HOME));
-        mHolder.away_name.setText(cursor.getString(COL_AWAY));
         mHolder.date.setText(cursor.getString(COL_MATCHTIME));
         mHolder.score.setText(Utilies.getScores(cursor.getInt(COL_HOME_GOALS), cursor.getInt(COL_AWAY_GOALS)));
         mHolder.match_id = cursor.getDouble(COL_ID);
-        Uri uri = Uri.parse(cursor.getString(COL_HOME_CREST_URL));
-        mRequestBuilder
-                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                .load(uri)
-                .into(mHolder.home_crest);
-        uri = Uri.parse(cursor.getString(COL_AWAY_CREST_URL));
-        mRequestBuilder
-                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                .load(uri)
-                .into(mHolder.away_crest);
+
+        // Home team name & crest
+        String name = cursor.getString(COL_HOME);
+        String url = cursor.getString(COL_HOME_CREST_URL);
+        setTeamInfo(mHolder.home_name, name, mHolder.home_crest, url);
+
+        // Away team name & crest
+        name = cursor.getString(COL_AWAY);
+        url = cursor.getString(COL_AWAY_CREST_URL);
+        setTeamInfo(mHolder.away_name, name, mHolder.away_crest, url);
+
         LOG.D(LOG_TAG, mHolder.home_name.getText() + " Vs. " + mHolder.away_name.getText() + " id " + String.valueOf(mHolder.match_id));
         LOG.D(LOG_TAG,String.valueOf(detail_match_id));
         LayoutInflater vi = (LayoutInflater) context.getApplicationContext()
@@ -128,11 +128,10 @@ public class scoresAdapter extends CursorAdapter
             Button share_button = (Button) v.findViewById(R.id.share_button);
             share_button.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View v)
-                {
+                public void onClick(View v) {
                     //add Share Action
-                    context.startActivity(createShareForecastIntent(mHolder.home_name.getText()+" "
-                    +mHolder.score.getText()+" "+mHolder.away_name.getText() + " "));
+                    context.startActivity(createShareForecastIntent(mHolder.home_name.getText() + " "
+                            + mHolder.score.getText() + " " + mHolder.away_name.getText() + " "));
                 }
             });
         }
@@ -142,6 +141,26 @@ public class scoresAdapter extends CursorAdapter
         }
 
     }
+
+    private void setTeamInfo(TextView nameView, String name, ImageView crestView, String url) {
+        float textSizeInPx;
+
+        if (name.length() > 20) {
+            textSizeInPx = mContext.getResources().getDimension(R.dimen.TeamNamesSmall);
+        } else if (name.length() > 12) {
+            textSizeInPx = mContext.getResources().getDimension(R.dimen.TeamNamesMedium);
+        } else {
+            textSizeInPx = mContext.getResources().getDimension(R.dimen.TeamNamesLarge);
+        }
+        nameView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSizeInPx);
+        nameView.setText(name);
+        Uri uri = Uri.parse(url);
+        mRequestBuilder
+                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                .load(uri)
+                .into(crestView);
+    }
+
     public Intent createShareForecastIntent(String ShareText) {
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
