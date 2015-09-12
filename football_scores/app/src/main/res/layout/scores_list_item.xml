@@ -18,8 +18,8 @@
             android:layout_weight="1"
             android:orientation="vertical">
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="@dimen/crest_width"
+                android:layout_height="@dimen/crest_height"
                 android:layout_gravity="center"
                 android:id="@+id/home_crest"
                 tools:src="@drawable/ic_launcher"/>
@@ -27,7 +27,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:textSize="@dimen/TeamNames"
+                android:textSize="@dimen/TeamNamesLarge"
                 android:gravity="center"
                 android:id="@+id/home_name"
                 tools:text="home"
@@ -41,7 +41,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                android:layout_weight="1"
+                android:layout_weight="1.5"
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:textSize="@dimen/Score"
@@ -65,8 +65,8 @@
             android:layout_weight="1"
             android:orientation="vertical">
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="@dimen/crest_width"
+                android:layout_height="@dimen/crest_height"
                 android:layout_gravity="center"
                 android:id="@+id/away_crest"
                 tools:src="@drawable/ic_launcher"
@@ -76,7 +76,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:textSize="@dimen/TeamNames"
+                android:textSize="@dimen/TeamNamesSmall"
                 android:id="@+id/away_name"
                 tools:text="away"
                 />
