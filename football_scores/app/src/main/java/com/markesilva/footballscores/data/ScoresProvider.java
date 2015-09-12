@@ -124,6 +124,8 @@ public class ScoresProvider extends ContentProvider {
                 String date = DatabaseContract.scores_table.getDateFromUri(uri);
                 retCursor = sScoreQuery.query(mOpenHelper.getReadableDatabase(),
                         projection, SCORES_BY_DATE, new String[]{date}, null, null, sortOrder);
+                retCursor.setNotificationUri(getContext().getContentResolver(), leagues_table.CONTENT_URI);
+                retCursor.setNotificationUri(getContext().getContentResolver(), teams_table.CONTENT_URI);
                 break;
             case MATCHES_WITH_ID:
                 retCursor = mOpenHelper.getReadableDatabase().query(
@@ -173,16 +175,24 @@ public class ScoresProvider extends ContentProvider {
         {
             case TEAMS: {
                 long _id = db.insert(teams_table.TABLE_NAME, null, values);
-                if (_id > 0)
+                if (_id > 0) {
                     returnUri = teams_table.buildTeamWithId(values.getAsString(teams_table.TEAM_ID_COL));
+                    // If we add a team, we need to trigger a change notification for hte scores_table
+                    // since the team info is linked
+                    getContext().getContentResolver().notifyChange(scores_table.CONTENT_URI, null);
+                }
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             }
             case LEAGUES: {
                 long _id = db.insert(leagues_table.TABLE_NAME, null, values);
-                if (_id > 0)
+                if (_id > 0) {
                     returnUri = teams_table.buildTeamWithId(values.getAsString(leagues_table.LEAGUE_ID_COL));
+                    // If we add a league, we need to trigger a change notification for hte scores_table
+                    // since the team info is linked
+                    getContext().getContentResolver().notifyChange(scores_table.CONTENT_URI, null);
+                }
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
