@@ -49,4 +49,16 @@ public class Utilies
             return String.valueOf(home_goals) + " - " + String.valueOf(away_goals);
         }
     }
+
+    public static String getScoresContentDescription(int home_goals,int away_goals)
+    {
+        if(home_goals < 0 || away_goals < 0)
+        {
+            return "no score";
+        }
+        else
+        {
+            return String.valueOf(home_goals) + " to " + String.valueOf(away_goals);
+        }
+    }
 }

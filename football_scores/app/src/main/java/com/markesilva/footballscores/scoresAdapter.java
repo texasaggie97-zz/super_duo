@@ -97,6 +97,7 @@ public class scoresAdapter extends CursorAdapter
         final ViewHolder mHolder = (ViewHolder) view.getTag();
         mHolder.date.setText(cursor.getString(COL_MATCHTIME));
         mHolder.score.setText(Utilies.getScores(cursor.getInt(COL_HOME_GOALS), cursor.getInt(COL_AWAY_GOALS)));
+        mHolder.score.setContentDescription(Utilies.getScoresContentDescription(cursor.getInt(COL_HOME_GOALS), cursor.getInt(COL_AWAY_GOALS)));
         mHolder.match_id = cursor.getDouble(COL_ID);
 
         // Home team name & crest
@@ -117,15 +118,16 @@ public class scoresAdapter extends CursorAdapter
         ViewGroup container = (ViewGroup) view.findViewById(R.id.details_fragment_container);
         if(mHolder.match_id == detail_match_id)
         {
-            LOG.D(LOG_TAG,"will insert extraView");
+            LOG.D(LOG_TAG, "will insert extraView");
 
             container.addView(v, 0, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT
                     , ViewGroup.LayoutParams.MATCH_PARENT));
             TextView match_day = (TextView) v.findViewById(R.id.matchday_textview);
-            match_day.setText(Utilies.getMatchDay(cursor.getInt(COL_MATCHDAY),
-                    cursor.getString(COL_LEAGUE_CODE)));
+            match_day.setText(Utilies.getMatchDay(cursor.getInt(COL_MATCHDAY), cursor.getString(COL_LEAGUE_CODE)));
+            match_day.setContentDescription(Utilies.getMatchDay(cursor.getInt(COL_MATCHDAY), cursor.getString(COL_LEAGUE_CODE)));
             TextView league = (TextView) v.findViewById(R.id.league_textview);
             league.setText(cursor.getString(COL_LEAGUE_NAME));
+            league.setContentDescription(cursor.getString(COL_LEAGUE_NAME));
             Button share_button = (Button) v.findViewById(R.id.share_button);
             share_button.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -157,8 +159,10 @@ public class scoresAdapter extends CursorAdapter
         // When we get the text size via a query it is returned in PX
         nameView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSizeInPx);
         nameView.setText(name);
+        nameView.setContentDescription(name);
         // If the crest is an svg file, we use our preconfigured Glide object,
         // otherwise we use the normal Glide methods
+        crestView.setContentDescription(name + mContext.getResources().getString(R.string.crest_description));
         if (url.toUpperCase().endsWith(".SVG")) {
             Uri uri = Uri.parse(url);
             mRequestBuilder

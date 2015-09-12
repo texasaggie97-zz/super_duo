@@ -21,6 +21,7 @@
                 android:layout_width="@dimen/crest_width"
                 android:layout_height="@dimen/crest_height"
                 android:layout_gravity="center"
+                android:contentDescription="@string/home_crest_description"
                 android:id="@+id/home_crest"
                 tools:src="@drawable/ic_launcher"/>
             <TextView
@@ -29,6 +30,7 @@
                 android:layout_gravity="center"
                 android:textSize="@dimen/TeamNamesLarge"
                 android:gravity="center"
+                android:contentDescription="@string/home_team_name_description"
                 android:id="@+id/home_name"
                 tools:text="home"
                 />
@@ -42,6 +44,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:layout_weight="1.5"
+                android:contentDescription="@string/score_description"
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:textSize="@dimen/Score"
@@ -52,6 +55,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:layout_weight="1"
+                android:contentDescription="@string/date_description"
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:id="@+id/data_textview"
@@ -68,12 +72,14 @@
                 android:layout_width="@dimen/crest_width"
                 android:layout_height="@dimen/crest_height"
                 android:layout_gravity="center"
+                android:contentDescription="@string/away_crest_description"
                 android:id="@+id/away_crest"
                 tools:src="@drawable/ic_launcher"
                 />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:contentDescription="@string/away_team_name_description"
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:textSize="@dimen/TeamNamesSmall"
