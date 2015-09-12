@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.os.SystemClock;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -514,10 +515,10 @@ public class myFetchService extends IntentService {
     }
 
     private class SpaceRequests extends AsyncTask<Void, Void, Void> {
-        private static final long WAIT_TIME_IN_MILLIS = 1000;
+        // wait time is based on 50 queries per minute allowed
+        private static final long WAIT_TIME_IN_MILLIS = 1200;
         private static final int MAX_EMPTY_LIMIT = 6;
         private long mNextSleepTime = WAIT_TIME_IN_MILLIS;
-        private final Calendar mCalendar = new GregorianCalendar();
         private int mEmptyCount = 0;
 
         @Override
@@ -525,19 +526,21 @@ public class myFetchService extends IntentService {
             LOG.D(LOG_TAG, "Entering work queue thread");
             while (mEmptyCount < MAX_EMPTY_LIMIT) {
                 try {
-                    LOG.D(LOG_TAG, "Sleeping for " + mNextSleepTime + " ms, " + mWorkQueue.size() + " items in the queue");
+                    //LOG.D(LOG_TAG, "Sleeping for " + mNextSleepTime + " ms, " + mWorkQueue.size() + " items in the queue, empty count is " + mEmptyCount);
                     Thread.sleep(mNextSleepTime);
                     FetchData nextWorker = mWorkQueue.poll();
                     if (nextWorker != null) {
-                        long startTime = mCalendar.getTimeInMillis();
+                        long startTime = SystemClock.elapsedRealtime();
                         nextWorker.fetchData();
-                        long endTime = mCalendar.getTimeInMillis();
+                        long endTime = SystemClock.elapsedRealtime();
                         mNextSleepTime = WAIT_TIME_IN_MILLIS - (endTime - startTime);
+                        mNextSleepTime = (mNextSleepTime < 0) ? 0 : mNextSleepTime;
                     } else {
                         mEmptyCount++;
                     }
                 } catch (Exception e) {
                     LOG.E(LOG_TAG, "Error", e);
+                    mNextSleepTime = WAIT_TIME_IN_MILLIS;
                 }
             }
             LOG.D(LOG_TAG, "Exiting work queue thread");
