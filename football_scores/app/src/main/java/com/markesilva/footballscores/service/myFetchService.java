@@ -381,7 +381,7 @@ public class myFetchService extends IntentService {
                 cv.put(DatabaseContract.leagues_table.ENABLED_COL, "1"); // By default, all leagues are enabled when first seen
                 cv.put(DatabaseContract.leagues_table.LEAGUE_CODE_COL, league_code);
                 Uri returnedUri = mContext.getContentResolver().insert(DatabaseContract.leagues_table.CONTENT_URI, cv);
-                LOG.D(LOG_TAG, "inserted league: " + returnedUri.toString());
+                //LOG.D(LOG_TAG, "inserted league: " + returnedUri.toString());
             } catch (Exception e) {
                 LOG.E(LOG_TAG, "Error when fetching " + mLeagueUrl + ". Trying again later...");
                 // This means we need to try again later
@@ -486,7 +486,7 @@ public class myFetchService extends IntentService {
                 cv.put(DatabaseContract.teams_table.NAME_COL, team_name);
                 cv.put(DatabaseContract.teams_table.CREST_URL_COL, crestUrl);
                 Uri returnedUri = mContext.getContentResolver().insert(DatabaseContract.teams_table.CONTENT_URI, cv);
-                LOG.D(LOG_TAG, "inserted team: " + returnedUri.toString());
+                //LOG.D(LOG_TAG, "inserted team: " + returnedUri.toString());
             } catch (Exception e) {
                 LOG.E(LOG_TAG, "Error when fetching " + mTeamUrl + ". Trying again later...");
                 // This means we need to try again later
