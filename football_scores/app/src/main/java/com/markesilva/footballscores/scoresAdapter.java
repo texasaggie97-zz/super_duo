@@ -146,6 +146,7 @@ public class scoresAdapter extends CursorAdapter
     private void setTeamInfo(TextView nameView, String name, ImageView crestView, String url) {
         float textSizeInPx;
 
+        // Adjust the text size based on string length
         if (name.length() > 20) {
             textSizeInPx = mContext.getResources().getDimension(R.dimen.TeamNamesSmall);
         } else if (name.length() > 12) {
@@ -153,12 +154,23 @@ public class scoresAdapter extends CursorAdapter
         } else {
             textSizeInPx = mContext.getResources().getDimension(R.dimen.TeamNamesLarge);
         }
+        // When we get the text size via a query it is returned in PX
         nameView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSizeInPx);
         nameView.setText(name);
-        Uri uri = Uri.parse(url);
-        mRequestBuilder
-                .load(uri)
-                .into(crestView);
+        // If the crest is an svg file, we use our preconfigured Glide object,
+        // otherwise we use the normal Glide methods
+        if (url.toUpperCase().endsWith(".SVG")) {
+            Uri uri = Uri.parse(url);
+            mRequestBuilder
+                    .load(uri)
+                    .into(crestView);
+        } else {
+            Glide.with(mContext)
+                    .load(url)
+                    .error(R.drawable.no_icon)
+                    .placeholder(R.drawable.no_icon)
+                    .into(crestView);
+        }
     }
 
     public Intent createShareForecastIntent(String ShareText) {
