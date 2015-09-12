@@ -109,8 +109,8 @@ public class scoresAdapter extends CursorAdapter
         url = cursor.getString(COL_AWAY_CREST_URL);
         setTeamInfo(mHolder.away_name, name, mHolder.away_crest, url);
 
-        LOG.D(LOG_TAG, mHolder.home_name.getText() + " Vs. " + mHolder.away_name.getText() + " id " + String.valueOf(mHolder.match_id));
-        LOG.D(LOG_TAG,String.valueOf(detail_match_id));
+        //LOG.D(LOG_TAG, mHolder.home_name.getText() + " Vs. " + mHolder.away_name.getText() + " id " + String.valueOf(mHolder.match_id));
+        //LOG.D(LOG_TAG,String.valueOf(detail_match_id));
         LayoutInflater vi = (LayoutInflater) context.getApplicationContext()
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View v = vi.inflate(R.layout.detail_fragment, null);
