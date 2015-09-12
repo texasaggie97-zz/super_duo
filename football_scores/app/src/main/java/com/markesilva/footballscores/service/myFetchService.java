@@ -316,7 +316,7 @@ public class myFetchService extends IntentService {
             mLeagueId = mLeagueUrl.replace(SEASON_LINK, "");
             Uri u = DatabaseContract.leagues_table.buildLeagueWithId(mLeagueId);
             Cursor c = mContext.getContentResolver().query(u, null, null, null, null);
-            LOG.D(LOG_TAG, "Searching for league " + mLeagueId + ", found " + c.getCount());
+            //LOG.D(LOG_TAG, "Searching for league " + mLeagueId + ", found " + c.getCount());
             mLeagueExists = c.getCount() > 0;
             c.close();
             if (!mLeagueExists) {
@@ -421,7 +421,7 @@ public class myFetchService extends IntentService {
 
             Uri u = DatabaseContract.teams_table.buildTeamWithId(mTeamId);
             Cursor c = mContext.getContentResolver().query(u, null, null, null, null);
-            LOG.D(LOG_TAG, "Searching for team " + mTeamId + ", found " + c.getCount());
+            //LOG.D(LOG_TAG, "Searching for team " + mTeamId + ", found " + c.getCount());
             mTeamExists = c.getCount() > 0;
             c.close();
             if (!mTeamExists) {
