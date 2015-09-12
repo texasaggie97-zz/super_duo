@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Handler;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,9 +23,11 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.TimeZone;
 import java.util.Vector;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.markesilva.footballscores.data.DatabaseContract;
 import com.markesilva.footballscores.R;
@@ -35,13 +38,39 @@ import com.markesilva.footballscores.utils.LOG;
  */
 public class myFetchService extends IntentService {
     public static final String LOG_TAG = LOG.makeLogTag(myFetchService.class);
+    private ConcurrentLinkedQueue<FetchData> mWorkQueue = new ConcurrentLinkedQueue<>();
+    private Handler mHandler;
+    private SpaceRequests mWorkTask;
 
     public myFetchService() {
         super("myFetchService");
     }
 
     @Override
+    public void onCreate() {
+        mHandler = new Handler();
+        mWorkTask = new SpaceRequests();
+        super.onCreate();
+    }
+
+    @Override
+    public void onDestroy() {
+    }
+
+    @Override
     protected void onHandleIntent(Intent intent) {
+        // Since we are already on a background thread, we need to jump through some hoops to
+        // start the worker thread from the main thread
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    mWorkTask.execute();
+                } catch (IllegalStateException e) {
+                    // If it is still running we will continue to add to the queue
+                }
+            }
+        });
         getData("n2");
         getData("p2");
 
@@ -57,72 +86,86 @@ public class myFetchService extends IntentService {
         Uri fetch_build = Uri.parse(BASE_URL).buildUpon().
                 appendQueryParameter(QUERY_TIME_FRAME, timeFrame).build();
         LOG.D(LOG_TAG, "The url we are looking at is: " + fetch_build.toString()); //log spam
-        HttpURLConnection m_connection = null;
-        BufferedReader reader = null;
-        String JSON_data = null;
-        //Opening Connection
-        try {
-            WaitForNextRequest.waitForNextRequest();
-            URL fetch = new URL(fetch_build.toString());
-            m_connection = (HttpURLConnection) fetch.openConnection();
-            m_connection.setRequestMethod("GET");
-            m_connection.addRequestProperty("X-Auth-Token", getString(R.string.api_key));
-            m_connection.connect();
+        AddSeasonAndScores season = new AddSeasonAndScores(fetch_build.toString());
+        mWorkQueue.add(season);
 
-            // Read the input stream into a String
-            InputStream inputStream = m_connection.getInputStream();
-            StringBuffer buffer = new StringBuffer();
-            if (inputStream == null) {
-                // Nothing to do.
-                return;
-            }
-            reader = new BufferedReader(new InputStreamReader(inputStream));
+    }
 
-            String line;
-            while ((line = reader.readLine()) != null) {
-                // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                // But it does make debugging a *lot* easier if you print out the completed
-                // buffer for debugging.
-                buffer.append(line + "\n");
-            }
-            if (buffer.length() == 0) {
-                // Stream was empty.  No point in parsing.
-                return;
-            }
-            JSON_data = buffer.toString();
-        } catch (Exception e) {
-            LOG.E(LOG_TAG, "Exception here", e);
-        } finally {
-            if (m_connection != null) {
-                m_connection.disconnect();
-            }
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    LOG.E(LOG_TAG, "Error Closing Stream");
-                }
-            }
+    private class AddSeasonAndScores implements FetchData {
+        private String mFixtureUrl;
+
+        AddSeasonAndScores(String url) {
+            mFixtureUrl = url;
         }
-        try {
-            if (JSON_data != null) {
-                //This bit is to check if the data contains any matches. If not, we call processJson on the dummy data
-                JSONArray matches = new JSONObject(JSON_data).getJSONArray("fixtures");
-                if (matches.length() == 0) {
-                    //if there is no data, call the function on dummy data
-                    //this is expected behavior during the off season.
-                    processJSONdata(getString(R.string.dummy_data), getApplicationContext(), false);
+
+        public void fetchData() {
+
+            HttpURLConnection m_connection = null;
+            BufferedReader reader = null;
+            String JSON_data = null;
+            //Opening Connection
+            try {
+                URL fetch = new URL(mFixtureUrl.toString());
+                m_connection = (HttpURLConnection) fetch.openConnection();
+                m_connection.setRequestMethod("GET");
+                m_connection.addRequestProperty("X-Auth-Token", getString(R.string.api_key));
+                m_connection.connect();
+
+                // Read the input stream into a String
+                InputStream inputStream = m_connection.getInputStream();
+                StringBuffer buffer = new StringBuffer();
+                if (inputStream == null) {
+                    // Nothing to do.
                     return;
                 }
+                reader = new BufferedReader(new InputStreamReader(inputStream));
+
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
+                    // But it does make debugging a *lot* easier if you print out the completed
+                    // buffer for debugging.
+                    buffer.append(line + "\n");
+                }
+                if (buffer.length() == 0) {
+                    // Stream was empty.  No point in parsing.
+                    return;
+                }
+                JSON_data = buffer.toString();
+
+                if (JSON_data != null) {
+                    //This bit is to check if the data contains any matches. If not, we call processJson on the dummy data
+                    JSONArray matches = new JSONObject(JSON_data).getJSONArray("fixtures");
+                    if (matches.length() == 0) {
+                        //if there is no data, call the function on dummy data
+                        //this is expected behavior during the off season.
+                        processJSONdata(getString(R.string.dummy_data), getApplicationContext(), false);
+                        return;
+                    }
 
 
-                processJSONdata(JSON_data, getApplicationContext(), true);
-            } else {
-                //Could not Connect
-                LOG.D(LOG_TAG, "Could not connect to server.");
+                    processJSONdata(JSON_data, getApplicationContext(), true);
+                } else {
+                    //Could not Connect
+                    LOG.D(LOG_TAG, "Could not connect to server.");
+                }
+            } catch (Exception e) {
+                LOG.E(LOG_TAG, "Error when fetching " + mFixtureUrl + ". Trying again later...");
+                // This means we need to try again later
+                AddSeasonAndScores scores = new AddSeasonAndScores(mFixtureUrl);
+                mWorkQueue.add(scores);
+            } finally {
+                if (m_connection != null) {
+                    m_connection.disconnect();
+                }
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (IOException e) {
+                        LOG.E(LOG_TAG, "Error Closing Stream");
+                    }
+                }
             }
-        } catch (Exception e) {
-            LOG.E(LOG_TAG, "Error:", e);
         }
     }
 
@@ -167,7 +210,9 @@ public class myFetchService extends IntentService {
                         getString("href");
                 AddLeagueIfNeeded addLeague = new AddLeagueIfNeeded(League, mContext);
                 League = addLeague.getLeagueId();
-                addLeague.execute();
+                if (!addLeague.getLeagueExists()) {
+                    mWorkQueue.add(addLeague);
+                }
                 //This if statement controls which leagues we're interested in the data from.
                 //add leagues here in order to have them be added to the DB.
                 // If you are finding no data in the app, check that this contains all the leagues.
@@ -184,12 +229,16 @@ public class myFetchService extends IntentService {
                     String away_team = match_data.getJSONObject(LINKS).getJSONObject(AWAY_TEAM).getString("href");
                     AddTeamIfNeeded awayTeamTask = new AddTeamIfNeeded(away_team, mContext);
                     Away = awayTeamTask.getTeamId();
-                    awayTeamTask.execute();
+                    if (!awayTeamTask.getTeamExists()) {
+                        mWorkQueue.add(awayTeamTask);
+                    }
 
                     String home_team = match_data.getJSONObject(LINKS).getJSONObject(HOME_TEAM).getString("href");
                     AddTeamIfNeeded homeTeamTask = new AddTeamIfNeeded(home_team, mContext);
                     Home = homeTeamTask.getTeamId();
-                    homeTeamTask.execute();
+                    if (!homeTeamTask.getTeamExists()) {
+                        mWorkQueue.add(homeTeamTask);
+                    }
 
                     mDate = match_data.getString(MATCH_DATE);
                     mTime = mDate.substring(mDate.indexOf("T") + 1, mDate.indexOf("Z"));
@@ -251,10 +300,11 @@ public class myFetchService extends IntentService {
         }
     }
 
-    private class AddLeagueIfNeeded extends AsyncTask<Void, Void, Void> {
+    private class AddLeagueIfNeeded implements FetchData {
         private String mLeagueUrl;
         private Context mContext;
         private String mLeagueId;
+        private boolean mLeagueExists;
         private final String SEASON_LINK = "http://api.football-data.org/alpha/soccerseasons/";
         private final String LEAGUE_CAPTION = "caption";
         private final String LEAGUE_CODE = "league";
@@ -263,92 +313,102 @@ public class myFetchService extends IntentService {
             mLeagueUrl = leagueUrl;
             mContext = context;
             mLeagueId = mLeagueUrl.replace(SEASON_LINK, "");
+            Uri u = DatabaseContract.leagues_table.buildLeagueWithId(mLeagueId);
+            Cursor c = mContext.getContentResolver().query(u, null, null, null, null);
+            LOG.D(LOG_TAG, "Searching for league " + mLeagueId + ", found " + c.getCount());
+            mLeagueExists = c.getCount() > 0;
+            c.close();
+            if (!mLeagueExists) {
+                ContentValues cv = new ContentValues();
+                cv.put(DatabaseContract.leagues_table.LEAGUE_ID_COL, mLeagueId);
+                cv.put(DatabaseContract.leagues_table.NAME_COL, getResources().getString(R.string.loading_data));
+                cv.put(DatabaseContract.leagues_table.ENABLED_COL, "1"); // By default, all leagues are enabled when first seen
+                cv.put(DatabaseContract.leagues_table.LEAGUE_CODE_COL, getResources().getString(R.string.loading_data));
+                Uri returnedUri = mContext.getContentResolver().insert(DatabaseContract.leagues_table.CONTENT_URI, cv);
+                LOG.D(LOG_TAG, "inserted league placeholder for: " + returnedUri.toString());
+            }
         }
 
         public String getLeagueId() {
             return mLeagueId;
         }
 
-        @Override
-        protected Void doInBackground(Void... params) {
-            Uri u = DatabaseContract.leagues_table.buildLeagueWithId(mLeagueId);
-            Cursor c = mContext.getContentResolver().query(u, null, null, null, null);
-            LOG.D(LOG_TAG, "Searching for league " + mLeagueId + ", found " + c.getCount());
-            boolean league_added = c.getCount() > 0;
-            c.close();
-            if (!league_added) {
-                String JSON_data = null;
-                BufferedReader reader = null;
-                HttpURLConnection m_connection = null;
-                try {
-                    LOG.D(LOG_TAG, "Getting League info from " + mLeagueUrl);
-                    WaitForNextRequest.waitForNextRequest();
-                    URL fetch = new URL(mLeagueUrl);
-                    m_connection = (HttpURLConnection) fetch.openConnection();
-                    m_connection.setRequestMethod("GET");
-                    m_connection.addRequestProperty("X-Auth-Token", getString(R.string.api_key));
-                    m_connection.connect();
+        public boolean getLeagueExists() {
+            return mLeagueExists;
+        }
 
-                    // Read the input stream into a String
-                    InputStream inputStream = m_connection.getInputStream();
-                    StringBuffer buffer = new StringBuffer();
-                    if (inputStream == null) {
-                        // Nothing to do.
-                        return null;
-                    }
-                    reader = new BufferedReader(new InputStreamReader(inputStream));
+        public void fetchData() {
+            String JSON_data = null;
+            BufferedReader reader = null;
+            HttpURLConnection league_conn = null;
+            try {
+                LOG.D(LOG_TAG, "Getting League info from " + mLeagueUrl);
+                URL fetch = new URL(mLeagueUrl);
+                league_conn = (HttpURLConnection) fetch.openConnection();
+                league_conn.setRequestMethod("GET");
+                league_conn.addRequestProperty("X-Auth-Token", getString(R.string.api_key));
+                league_conn.connect();
 
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                        // But it does make debugging a *lot* easier if you print out the completed
-                        // buffer for debugging.
-                        buffer.append(line + "\n");
-                    }
-                    if (buffer.length() == 0) {
-                        // Stream was empty.  No point in parsing.
-                        return null;
-                    }
-                    JSON_data = buffer.toString();
-                } catch (Exception e) {
-                    LOG.E(LOG_TAG, "Exception here", e);
-                } finally {
-                    if (m_connection != null) {
-                        m_connection.disconnect();
-                    }
-                    if (reader != null) {
-                        try {
-                            reader.close();
-                        } catch (IOException e) {
-                            LOG.E(LOG_TAG, "Error Closing Stream");
-                        }
-                    }
+                // Read the input stream into a String
+                InputStream inputStream = league_conn.getInputStream();
+                StringBuffer buffer = new StringBuffer();
+                if (inputStream == null) {
+                    // Nothing to do.
+                    return;
                 }
-                try {
-                    JSONObject league = new JSONObject(JSON_data);
-                    String league_name = league.getString(LEAGUE_CAPTION);
-                    String league_code = league.getString(LEAGUE_CODE);
+                reader = new BufferedReader(new InputStreamReader(inputStream));
 
-                    ContentValues cv = new ContentValues();
-                    cv.put(DatabaseContract.leagues_table.LEAGUE_ID_COL, mLeagueId);
-                    cv.put(DatabaseContract.leagues_table.NAME_COL, league_name);
-                    cv.put(DatabaseContract.leagues_table.ENABLED_COL, "1"); // By default, all leagues are enabled when first seen
-                    cv.put(DatabaseContract.leagues_table.LEAGUE_CODE_COL, league_code);
-                    Uri returnedUri = mContext.getContentResolver().insert(DatabaseContract.leagues_table.CONTENT_URI, cv);
-                    LOG.D(LOG_TAG, "inserted league: " + returnedUri.toString());
-                } catch (Exception e) {
-                    LOG.E(LOG_TAG, "Exception here", e);
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
+                    // But it does make debugging a *lot* easier if you print out the completed
+                    // buffer for debugging.
+                    buffer.append(line + "\n");
+                }
+                if (buffer.length() == 0) {
+                    // Stream was empty.  No point in parsing.
+                    return;
+                }
+                JSON_data = buffer.toString();
+
+                JSONObject league = new JSONObject(JSON_data);
+                String league_name = league.getString(LEAGUE_CAPTION);
+                String league_code = league.getString(LEAGUE_CODE);
+
+                ContentValues cv = new ContentValues();
+                cv.put(DatabaseContract.leagues_table.LEAGUE_ID_COL, mLeagueId);
+                cv.put(DatabaseContract.leagues_table.NAME_COL, league_name);
+                cv.put(DatabaseContract.leagues_table.ENABLED_COL, "1"); // By default, all leagues are enabled when first seen
+                cv.put(DatabaseContract.leagues_table.LEAGUE_CODE_COL, league_code);
+                Uri returnedUri = mContext.getContentResolver().insert(DatabaseContract.leagues_table.CONTENT_URI, cv);
+                LOG.D(LOG_TAG, "inserted league: " + returnedUri.toString());
+            } catch (Exception e) {
+                LOG.E(LOG_TAG, "Error when fetching " + mLeagueUrl + ". Trying again later...");
+                // This means we need to try again later
+                AddLeagueIfNeeded league = new AddLeagueIfNeeded(mLeagueUrl, mContext);
+                mWorkQueue.add(league);
+            } finally {
+                if (league_conn != null) {
+                    league_conn.disconnect();
+                }
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (IOException e) {
+                        LOG.E(LOG_TAG, "Error Closing Stream");
+                    }
                 }
             }
 
-            return null;
+            return;
         }
     }
 
-    private class AddTeamIfNeeded extends AsyncTask<Void, Void, Void> {
+    private class AddTeamIfNeeded implements FetchData {
         private String mTeamUrl;
         private Context mContext;
         private String mTeamId;
+        private boolean mTeamExists;
         private final String TEAM_LINK = "http://api.football-data.org/alpha/teams/";
         private final String NAME = "name";
         private final String CREST_URL = "crestUrl";
@@ -357,109 +417,132 @@ public class myFetchService extends IntentService {
             mTeamUrl = leagueUrl;
             mContext = context;
             mTeamId = mTeamUrl.replace(TEAM_LINK, "");
+
+            Uri u = DatabaseContract.teams_table.buildTeamWithId(mTeamId);
+            Cursor c = mContext.getContentResolver().query(u, null, null, null, null);
+            LOG.D(LOG_TAG, "Searching for team " + mTeamId + ", found " + c.getCount());
+            mTeamExists = c.getCount() > 0;
+            c.close();
+            if (!mTeamExists) {
+                // The team doesn't exist in the DB so we add some placeholder values so
+                // cards can be displayed
+                ContentValues cv = new ContentValues();
+                cv.put(DatabaseContract.teams_table.TEAM_ID_COL, mTeamId);
+                cv.put(DatabaseContract.teams_table.NAME_COL, getResources().getString(R.string.loading_data));
+                cv.put(DatabaseContract.teams_table.CREST_URL_COL, "");
+                Uri returnedUri = mContext.getContentResolver().insert(DatabaseContract.teams_table.CONTENT_URI, cv);
+                LOG.D(LOG_TAG, "inserted team placeholder for: " + returnedUri.toString());
+            }
         }
 
         public String getTeamId() {
             return mTeamId;
         }
 
-        @Override
-        protected Void doInBackground(Void... params) {
-            Uri u = DatabaseContract.teams_table.buildTeamWithId(mTeamId);
-            Cursor c = mContext.getContentResolver().query(u, null, null, null, null);
-            LOG.D(LOG_TAG, "Searching for team " + mTeamId + ", found " + c.getCount());
-            boolean team_added = c.getCount() > 0;
-            c.close();
-            if (!team_added) {
-                String JSON_data = null;
-                BufferedReader reader = null;
-                HttpURLConnection team_conn = null;
-                try {
-                    LOG.D(LOG_TAG, "Getting team info from " + mTeamUrl);
-                    WaitForNextRequest.waitForNextRequest();
-                    URL fetch = new URL(mTeamUrl);
-                    team_conn = (HttpURLConnection) fetch.openConnection();
-                    team_conn.setRequestMethod("GET");
-                    team_conn.addRequestProperty("X-Auth-Token", getString(R.string.api_key));
-                    team_conn.connect();
+        public boolean getTeamExists() {
+            return mTeamExists;
+        }
 
-                    // Read the input stream into a String
-                    InputStream inputStream = team_conn.getInputStream();
-                    StringBuffer buffer = new StringBuffer();
-                    if (inputStream == null) {
-                        // Nothing to do.
-                        return null;
-                    }
-                    reader = new BufferedReader(new InputStreamReader(inputStream));
+        public void fetchData() {
+            String JSON_data = null;
+            BufferedReader reader = null;
+            HttpURLConnection team_conn = null;
+            try {
+                LOG.D(LOG_TAG, "Getting team info from " + mTeamUrl);
+                URL fetch = new URL(mTeamUrl);
+                team_conn = (HttpURLConnection) fetch.openConnection();
+                team_conn.setRequestMethod("GET");
+                team_conn.addRequestProperty("X-Auth-Token", getString(R.string.api_key));
+                team_conn.connect();
 
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                        // But it does make debugging a *lot* easier if you print out the completed
-                        // buffer for debugging.
-                        buffer.append(line + "\n");
-                    }
-                    if (buffer.length() == 0) {
-                        // Stream was empty.  No point in parsing.
-                        return null;
-                    }
-                    JSON_data = buffer.toString();
-                } catch (Exception e) {
-                    LOG.E(LOG_TAG, "Exception here", e);
-                } finally {
-                    if (team_conn != null) {
-                        team_conn.disconnect();
-                    }
-                    if (reader != null) {
-                        try {
-                            reader.close();
-                        } catch (IOException e) {
-                            LOG.E(LOG_TAG, "Error Closing Stream");
-                        }
-                    }
+                // Read the input stream into a String
+                InputStream inputStream = team_conn.getInputStream();
+                StringBuffer buffer = new StringBuffer();
+                if (inputStream == null) {
+                    // Nothing to do.
+                    return;
                 }
-                try {
-                    JSONObject team = new JSONObject(JSON_data);
-                    String team_name = team.getString(NAME);
-                    String crestUrl = team.getString(CREST_URL);
+                reader = new BufferedReader(new InputStreamReader(inputStream));
 
-                    ContentValues cv = new ContentValues();
-                    cv.put(DatabaseContract.teams_table.TEAM_ID_COL, mTeamId);
-                    cv.put(DatabaseContract.teams_table.NAME_COL, team_name);
-                    cv.put(DatabaseContract.teams_table.CREST_URL_COL, crestUrl);
-                    Uri returnedUri = mContext.getContentResolver().insert(DatabaseContract.teams_table.CONTENT_URI, cv);
-                    LOG.D(LOG_TAG, "inserted league: " + returnedUri.toString());
-                } catch (Exception e) {
-                    LOG.E(LOG_TAG, "Exception here", e);
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
+                    // But it does make debugging a *lot* easier if you print out the completed
+                    // buffer for debugging.
+                    buffer.append(line + "\n");
+                }
+                if (buffer.length() == 0) {
+                    // Stream was empty.  No point in parsing.
+                    return;
+                }
+                JSON_data = buffer.toString();
+
+                JSONObject team = new JSONObject(JSON_data);
+                String team_name = team.getString(NAME);
+                String crestUrl = team.getString(CREST_URL);
+
+                ContentValues cv = new ContentValues();
+                cv.put(DatabaseContract.teams_table.TEAM_ID_COL, mTeamId);
+                cv.put(DatabaseContract.teams_table.NAME_COL, team_name);
+                cv.put(DatabaseContract.teams_table.CREST_URL_COL, crestUrl);
+                Uri returnedUri = mContext.getContentResolver().insert(DatabaseContract.teams_table.CONTENT_URI, cv);
+                LOG.D(LOG_TAG, "inserted team: " + returnedUri.toString());
+            } catch (Exception e) {
+                LOG.E(LOG_TAG, "Error when fetching " + mTeamUrl + ". Trying again later...");
+                // This means we need to try again later
+                AddTeamIfNeeded team = new AddTeamIfNeeded(mTeamUrl, mContext);
+                mWorkQueue.add(team);
+            } finally {
+                if (team_conn != null) {
+                    team_conn.disconnect();
+                }
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (IOException e) {
+                        LOG.E(LOG_TAG, "Error Closing Stream");
+                    }
                 }
             }
 
-            return null;
+            return;
         }
     }
 
-    private static class WaitForNextRequest {
-        private static long mNextRequestTime = 0;
-        private static Calendar mCalendar = new GregorianCalendar();
-        private static final ReentrantLock mLock = new ReentrantLock();
-        private static final long MILLIS_TO_WAIT = 75;
+    private interface FetchData {
+        void fetchData();
+    }
 
-        public static void waitForNextRequest() {
-            try {
-                mLock.lock();
-                long currentTime = mCalendar.getTimeInMillis();
-                if (mNextRequestTime == 0) {
-                    mNextRequestTime = currentTime;
-                } else {
-                    mNextRequestTime += MILLIS_TO_WAIT;
+    private class SpaceRequests extends AsyncTask<Void, Void, Void> {
+        private static final long WAIT_TIME_IN_MILLIS = 1000;
+        private static final int MAX_EMPTY_LIMIT = 6;
+        private long mNextSleepTime = WAIT_TIME_IN_MILLIS;
+        private final Calendar mCalendar = new GregorianCalendar();
+        private int mEmptyCount = 0;
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            LOG.D(LOG_TAG, "Entering work queue thread");
+            while (mEmptyCount < MAX_EMPTY_LIMIT) {
+                try {
+                    LOG.D(LOG_TAG, "Sleeping for " + mNextSleepTime + " ms, " + mWorkQueue.size() + " items in the queue");
+                    Thread.sleep(mNextSleepTime);
+                    FetchData nextWorker = mWorkQueue.poll();
+                    if (nextWorker != null) {
+                        long startTime = mCalendar.getTimeInMillis();
+                        nextWorker.fetchData();
+                        long endTime = mCalendar.getTimeInMillis();
+                        mNextSleepTime = WAIT_TIME_IN_MILLIS - (endTime - startTime);
+                    } else {
+                        mEmptyCount++;
+                    }
+                } catch (Exception e) {
+                    LOG.E(LOG_TAG, "Error", e);
                 }
-                mLock.unlock();
-                if (mNextRequestTime > currentTime) {
-                    Thread.sleep(mNextRequestTime - currentTime);
-                }
-            } catch (Exception e) {
-                LOG.E(LOG_TAG, "Exception", e);
             }
+            LOG.D(LOG_TAG, "Exiting work queue thread");
+
+            return null;
         }
     }
 }
