@@ -373,18 +373,18 @@ public class myFetchService extends IntentService {
             if (!team_added) {
                 String JSON_data = null;
                 BufferedReader reader = null;
-                HttpURLConnection m_connection = null;
+                HttpURLConnection team_conn = null;
                 try {
                     LOG.D(LOG_TAG, "Getting team info from " + mTeamUrl);
                     WaitForNextRequest.waitForNextRequest();
                     URL fetch = new URL(mTeamUrl);
-                    m_connection = (HttpURLConnection) fetch.openConnection();
-                    m_connection.setRequestMethod("GET");
-                    m_connection.addRequestProperty("X-Auth-Token", getString(R.string.api_key));
-                    m_connection.connect();
+                    team_conn = (HttpURLConnection) fetch.openConnection();
+                    team_conn.setRequestMethod("GET");
+                    team_conn.addRequestProperty("X-Auth-Token", getString(R.string.api_key));
+                    team_conn.connect();
 
                     // Read the input stream into a String
-                    InputStream inputStream = m_connection.getInputStream();
+                    InputStream inputStream = team_conn.getInputStream();
                     StringBuffer buffer = new StringBuffer();
                     if (inputStream == null) {
                         // Nothing to do.
@@ -407,8 +407,8 @@ public class myFetchService extends IntentService {
                 } catch (Exception e) {
                     LOG.E(LOG_TAG, "Exception here", e);
                 } finally {
-                    if (m_connection != null) {
-                        m_connection.disconnect();
+                    if (team_conn != null) {
+                        team_conn.disconnect();
                     }
                     if (reader != null) {
                         try {
