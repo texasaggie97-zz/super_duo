@@ -278,7 +278,7 @@ public class myFetchService extends IntentService {
                     match_values.put(DatabaseContract.scores_table.MATCH_DAY, match_day);
                     //log spam
 
-                    LOG.D(LOG_TAG, "Inserting: " + match_id + ", " + mDate + ", " + mTime + ", " + Home + "(" + Home_goals + "), " + Away + "(" + Away_goals + ")");
+                    //LOG.D(LOG_TAG, "Inserting: " + match_id + ", " + mDate + ", " + mTime + ", " + Home + "(" + Home_goals + "), " + Away + "(" + Away_goals + ")");
                     //LOG.D(LOG_TAG, mDate);
                     //LOG.D(LOG_TAG, mTime);
                     //LOG.D(LOG_TAG, Home);
