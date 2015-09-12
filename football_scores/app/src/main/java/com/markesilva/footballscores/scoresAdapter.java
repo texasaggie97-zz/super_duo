@@ -85,6 +85,7 @@ public class scoresAdapter extends CursorAdapter
                     .decoder(new SvgDecoder())
                     .animate(android.R.anim.fade_in)
                     .placeholder(R.drawable.no_icon)
+                    .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                     .listener(new SvgSoftwareLayerSetter<Uri>());
         }
         return mItem;
@@ -156,7 +157,6 @@ public class scoresAdapter extends CursorAdapter
         nameView.setText(name);
         Uri uri = Uri.parse(url);
         mRequestBuilder
-                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .load(uri)
                 .into(crestView);
     }

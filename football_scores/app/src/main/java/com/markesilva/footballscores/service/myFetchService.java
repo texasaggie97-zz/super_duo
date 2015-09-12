@@ -442,7 +442,7 @@ public class myFetchService extends IntentService {
         private static long mNextRequestTime = 0;
         private static Calendar mCalendar = new GregorianCalendar();
         private static final ReentrantLock mLock = new ReentrantLock();
-        private static final long MILLIS_TO_WAIT = 30;
+        private static final long MILLIS_TO_WAIT = 50;
 
         public static void waitForNextRequest() {
             try {
