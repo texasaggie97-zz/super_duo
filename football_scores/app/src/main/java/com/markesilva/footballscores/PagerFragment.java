@@ -23,7 +23,7 @@ public class PagerFragment extends Fragment
     public static final int NUM_PAGES = 5;
     public ViewPager mPagerHandler;
     private myPageAdapter mPagerAdapter;
-    private MainScreenFragment[] viewFragments = new MainScreenFragment[5];
+    private MainScreenFragment[] viewFragments = new MainScreenFragment[NUM_PAGES];
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
@@ -41,6 +41,7 @@ public class PagerFragment extends Fragment
         mPagerHandler.setCurrentItem(MainActivity.current_fragment);
         return rootView;
     }
+
     private class myPageAdapter extends FragmentStatePagerAdapter
     {
         @Override
@@ -59,12 +60,14 @@ public class PagerFragment extends Fragment
         {
             super(fm);
         }
+
         // Returns the page title for the top indicator
         @Override
         public CharSequence getPageTitle(int position)
         {
-            return getDayName(getActivity(),System.currentTimeMillis()+((position-2)*86400000));
+            return getDayName(getActivity(),System.currentTimeMillis()+((position-(NUM_PAGES/2))*86400000));
         }
+
         public String getDayName(Context context, long dateInMillis) {
             // If the date is today, return the localized version of "Today" instead of the actual
             // day name.
