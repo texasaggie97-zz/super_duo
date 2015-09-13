@@ -27,7 +27,7 @@ public class ScoresProvider extends ContentProvider {
 
     private UriMatcher muriMatcher = buildUriMatcher();
     private static final String SCORES_BY_LEAGUE = scores_table.TABLE_NAME + "." + scores_table.LEAGUE_COL + " = ?";
-    private static final String SCORES_BY_DATE =   scores_table.TABLE_NAME + "." + scores_table.DATE_COL + " LIKE ?";
+    private static final String SCORES_BY_DATE =   scores_table.TABLE_NAME + "." + scores_table.DATE_COL + " LIKE ? AND " + leagues_table.TABLE_NAME + "." + leagues_table.ENABLED_COL + " = '1'";
     private static final String SCORES_BY_ID =     scores_table.TABLE_NAME + "." + scores_table.MATCH_ID + " = ?";
     private static final String TEAM_BY_ID =       teams_table.TABLE_NAME + "." + teams_table.TEAM_ID_COL + " = ?";
     private static final String LEAGUE_BY_ID =     leagues_table.TABLE_NAME + "." + leagues_table.LEAGUE_ID_COL + " = ?";
@@ -79,7 +79,21 @@ public class ScoresProvider extends ContentProvider {
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        return 0;
+        int retId;
+        //Log.v(FetchScoreTask.LOG_TAG,uri.getPathSegments().toString());
+        //Log.v(FetchScoreTask.LOG_TAG,SCORES_BY_LEAGUE);
+        //Log.v(FetchScoreTask.LOG_TAG,selectionArgs[0]);
+        //Log.v(FetchScoreTask.LOG_TAG,String.valueOf(match));
+        switch (muriMatcher.match(uri)) {
+            case LEAGUE_WITH_ID:
+                String league = DatabaseContract.leagues_table.getLeagueFromUri(uri);
+                retId = mOpenHelper.getReadableDatabase().update(leagues_table.TABLE_NAME, values, LEAGUE_BY_ID, new String[]{league});
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown Uri " + uri);
+        }
+
+        return retId;
     }
 
     @Override
@@ -205,15 +219,16 @@ public class ScoresProvider extends ContentProvider {
         return returnUri;
     }
 
+
     @Override
     public int bulkInsert(Uri uri, ContentValues[] values) {
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         //db.delete(DatabaseContract.TABLE_NAME,null,null);
         //Log.v(FetchScoreTask.LOG_TAG,String.valueOf(muriMatcher.match(uri)));
+        int returnCount = 0;
         switch (muriMatcher.match(uri)) {
             case MATCHES:
                 db.beginTransaction();
-                int returnCount = 0;
                 try {
                     for (ContentValues value : values) {
                         long _id = db.insertWithOnConflict(scores_table.TABLE_NAME, null, value,
@@ -227,10 +242,28 @@ public class ScoresProvider extends ContentProvider {
                     db.endTransaction();
                 }
                 getContext().getContentResolver().notifyChange(uri, null);
-                return returnCount;
+                break;
+            case LEAGUES:
+                db.beginTransaction();
+                try {
+                    for (ContentValues value : values) {
+                        long _id = db.insertWithOnConflict(leagues_table.TABLE_NAME, null, value,
+                                SQLiteDatabase.CONFLICT_REPLACE);
+                        if (_id != -1) {
+                            returnCount++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+                getContext().getContentResolver().notifyChange(uri, null);
+                break;
             default:
                 return super.bulkInsert(uri, values);
         }
+
+        return returnCount;
     }
 
     @Override

@@ -6,13 +6,8 @@
     android:layout_height="match_parent"
     tools:context="com.markesilva.footballscores.LeagueSelectionFragment">
 
-    <include
-        layout="@layout/league_selection_buttons"
-        />
-
     <ListView
         android:id="@android:id/list"
-        android:layout_marginTop="50dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:divider="@android:color/transparent"
@@ -21,7 +16,6 @@
 
     <TextView
         android:id="@android:id/empty"
-        android:layout_below="@+id/select_league_okay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:text="Empty"

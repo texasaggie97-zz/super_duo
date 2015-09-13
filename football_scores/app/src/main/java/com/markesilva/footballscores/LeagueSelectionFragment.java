@@ -1,6 +1,7 @@
 package com.markesilva.footballscores;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -8,20 +9,21 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CursorAdapter;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import com.markesilva.footballscores.data.DatabaseContract;
-import com.markesilva.footballscores.dummy.DummyContent;
 import com.markesilva.footballscores.utils.LOG;
+
+import java.util.Vector;
 
 /**
  * A fragment representing a list of Items.
@@ -31,9 +33,10 @@ import com.markesilva.footballscores.utils.LOG;
  * <p/>
  * interface.
  */
-public class LeagueSelectionFragment extends Fragment implements AbsListView.OnItemClickListener,LoaderManager.LoaderCallbacks<Cursor> {
+public class LeagueSelectionFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private final static String LOG_TAG = LOG.makeLogTag(LeagueSelectionFragment.class);
     private final static int LOADER_ID = 1;
+    private final static String SORT_ODER = DatabaseContract.leagues_table.NAME_COL + " ASC";
 
     /**
      * The fragment's ListView/GridView.
@@ -70,9 +73,6 @@ public class LeagueSelectionFragment extends Fragment implements AbsListView.OnI
         mListView = (AbsListView) view.findViewById(android.R.id.list);
         ((AdapterView<ListAdapter>) mListView).setAdapter(mAdapter);
 
-        // Set OnItemClickListener so we can be notified on item clicks
-        mListView.setOnItemClickListener(this);
-
         getLoaderManager().initLoader(LOADER_ID, null, this);
 
         return view;
@@ -87,15 +87,6 @@ public class LeagueSelectionFragment extends Fragment implements AbsListView.OnI
     public void onDetach() {
         super.onDetach();
 //        mListener = null;
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//        if (null != mListener) {
-//            // Notify the active callbacks interface (the activity, if the
-//            // fragment is attached to one) that an item has been selected.
-//            mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).id);
-//        }
     }
 
     /**
@@ -116,7 +107,7 @@ public class LeagueSelectionFragment extends Fragment implements AbsListView.OnI
     {
         // We want all the columns so we can update them later
         return new CursorLoader(getActivity(), DatabaseContract.leagues_table.CONTENT_URI,
-                null, null, null, null);
+                null, null, null, SORT_ODER);
     }
 
     @Override
@@ -129,7 +120,7 @@ public class LeagueSelectionFragment extends Fragment implements AbsListView.OnI
         cursor.moveToFirst();
         //Log.v(FetchScoreTask.LOG_TAG,"Loader query: " + String.valueOf(i));
         mAdapter.swapCursor(cursor);
-        //mAdapter.notifyDataSetChanged();
+        mAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -142,15 +133,28 @@ public class LeagueSelectionFragment extends Fragment implements AbsListView.OnI
         public TextView mLeagueName;
         public CheckBox mEnabled;
         public String mLeagueId;
+        public String mLeagueCode;
 
         public ViewHolder(View view) {
             mLeagueName = (TextView) view.findViewById(R.id.league_selection_name);
             mEnabled = (CheckBox) view.findViewById(R.id.league_selection_enabled);
+            mEnabled.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ContentValues cv = new ContentValues();
+                    cv.put(DatabaseContract.leagues_table.ENABLED_COL, mEnabled.isChecked() ? "1" : "0");
+                    getActivity().getContentResolver().update(DatabaseContract.leagues_table.buildLeagueWithId(mLeagueId), cv, null, null);
+                }
+            });
         }
 
     }
 
     public class LeagueSelectionAdapter extends CursorAdapter {
+
+        private int NAME_COL_INDEX = -1;
+        private int ENABLED_COL_INDEX = -1;
+        private int ID_COL_INDEX = -1;
 
         public LeagueSelectionAdapter(Context context,Cursor cursor,int flags)
         {
@@ -168,10 +172,15 @@ public class LeagueSelectionFragment extends Fragment implements AbsListView.OnI
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
             final ViewHolder holder = (ViewHolder) view.getTag();
+            if (NAME_COL_INDEX == -1) {
+                NAME_COL_INDEX = cursor.getColumnIndex(DatabaseContract.leagues_table.NAME_COL);
+                ENABLED_COL_INDEX = cursor.getColumnIndex(DatabaseContract.leagues_table.ENABLED_COL);
+                ID_COL_INDEX = cursor.getColumnIndex(DatabaseContract.leagues_table.LEAGUE_ID_COL);
+            }
 
-            holder.mLeagueName.setText(cursor.getString(cursor.getColumnIndex(DatabaseContract.leagues_table.NAME_COL)));
-            holder.mEnabled.setChecked(cursor.getString(cursor.getColumnIndex(DatabaseContract.leagues_table.ENABLED_COL)).equals("1") ? true : false);
-            holder.mLeagueId = cursor.getString(cursor.getColumnIndex(DatabaseContract.leagues_table.LEAGUE_ID_COL));
+            holder.mLeagueName.setText(cursor.getString(NAME_COL_INDEX));
+            holder.mEnabled.setChecked(cursor.getString(ENABLED_COL_INDEX).equals("1") ? true : false);
+            holder.mLeagueId = cursor.getString(ID_COL_INDEX);
         }
     }
 }
