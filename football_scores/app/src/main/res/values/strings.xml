@@ -8,11 +8,6 @@
     <string name="today">Today</string>
     <string name="yesterday">Yesterday</string>
     <string name="tomorrow">Tomorrow</string>
-    <string name="champions_league">UEFA Champions League</string>
-    <string name="bundesliga">Bundesliga</string>
-    <string name="premierleague">Premier League</string>
-    <string name="primeradivison">Primera Division</string>
-    <string name="seriaa">Serie A</string>
     <string name="matchday_text">Match day</string>
     <string name="group_stage_text">Group stages</string>
     <string name="first_knockout_round">First knockout round</string>
@@ -22,7 +17,11 @@
     <string name="share_text">Share</string>
     <string name="about">About</string>
     <string name="title_activity_about">AboutActivity</string>
+    <string name="select_leagues">Select Leagues</string>
+    <string name="title_activity_league_selection">League Selection</string>
     <string name="loading_data">Loading...</string>
+    <string name="okay_button_text">Okay</string>
+    <string name="cancel_button_text">Cancel</string>
     <string name="about_text">
         This Application gets Soccer (Metric Football) Matches Scores for all leagues supported by football-data.org.
         All Matches data are acquired from football-data.org free API.

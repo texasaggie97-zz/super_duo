@@ -22,7 +22,7 @@ public class MainActivity extends ActionBarActivity
         if (savedInstanceState == null) {
             my_main = new PagerFragment();
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, my_main)
+                    .add(R.id.main_container, my_main)
                     .commit();
         }
     }
@@ -47,6 +47,11 @@ public class MainActivity extends ActionBarActivity
         {
             Intent start_about = new Intent(this,AboutActivity.class);
             startActivity(start_about);
+            return true;
+        }
+        if (id == R.id.action_select_leagues) {
+            Intent start_select_leagues = new Intent(this, LeagueSelectionActivity.class);
+            startActivity(start_select_leagues);
             return true;
         }
 
