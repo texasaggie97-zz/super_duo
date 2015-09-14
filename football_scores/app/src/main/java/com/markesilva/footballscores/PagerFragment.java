@@ -62,6 +62,8 @@ public class PagerFragment extends Fragment
         }
 
         // Returns the page title for the top indicator
+        // Due to this issue https://code.google.com/p/android/issues/detail?id=183127
+        // Titles do not show up until scrolled left or right
         @Override
         public CharSequence getPageTitle(int position)
         {
