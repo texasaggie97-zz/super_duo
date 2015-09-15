@@ -133,7 +133,6 @@ public class LeagueSelectionFragment extends Fragment implements LoaderManager.L
         public TextView mLeagueName;
         public CheckBox mEnabled;
         public String mLeagueId;
-        public String mLeagueCode;
 
         public ViewHolder(View view) {
             mLeagueName = (TextView) view.findViewById(R.id.league_selection_name);
@@ -144,6 +143,7 @@ public class LeagueSelectionFragment extends Fragment implements LoaderManager.L
                     ContentValues cv = new ContentValues();
                     cv.put(DatabaseContract.leagues_table.ENABLED_COL, mEnabled.isChecked() ? "1" : "0");
                     getActivity().getContentResolver().update(DatabaseContract.leagues_table.buildLeagueWithId(mLeagueId), cv, null, null);
+                    getLoaderManager().restartLoader(LOADER_ID, null, LeagueSelectionFragment.this);
                 }
             });
         }

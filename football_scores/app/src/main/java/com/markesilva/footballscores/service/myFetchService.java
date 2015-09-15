@@ -21,11 +21,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.TimeZone;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -72,8 +68,8 @@ public class myFetchService extends IntentService {
                 }
             }
         });
-        getData("n2");
-        getData("p2");
+        getData("n3");
+        getData("p3");
 
         return;
     }

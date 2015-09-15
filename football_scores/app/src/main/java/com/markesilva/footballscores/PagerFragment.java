@@ -23,7 +23,7 @@ public class PagerFragment extends Fragment
     public static final int NUM_PAGES = 5;
     public ViewPager mPagerHandler;
     private myPageAdapter mPagerAdapter;
-    private MainScreenFragment[] viewFragments = new MainScreenFragment[NUM_PAGES];
+    private MainScreenFragment[] mViewFragments = new MainScreenFragment[NUM_PAGES];
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
@@ -34,12 +34,18 @@ public class PagerFragment extends Fragment
         {
             Date fragmentdate = new Date(System.currentTimeMillis()+((i-2)*86400000));
             SimpleDateFormat mformat = new SimpleDateFormat("yyyy-MM-dd");
-            viewFragments[i] = new MainScreenFragment();
-            viewFragments[i].setFragmentDate(mformat.format(fragmentdate));
+            mViewFragments[i] = new MainScreenFragment();
+            mViewFragments[i].setFragmentDate(mformat.format(fragmentdate));
         }
         mPagerHandler.setAdapter(mPagerAdapter);
         mPagerHandler.setCurrentItem(MainActivity.current_fragment);
         return rootView;
+    }
+
+    public void restartLoaders() {
+        for (int i = 0; i < NUM_PAGES; i++) {
+            getLoaderManager().restartLoader(MainScreenFragment.SCORES_LOADER, null, mViewFragments[i]);
+        }
     }
 
     private class myPageAdapter extends FragmentStatePagerAdapter
@@ -47,7 +53,7 @@ public class PagerFragment extends Fragment
         @Override
         public Fragment getItem(int i)
         {
-            return viewFragments[i];
+            return mViewFragments[i];
         }
 
         @Override

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- scores widget -->
+    <dimen name="widget_scores_default_width">250dp</dimen>
+    <dimen name="widget_scores_default_height">110dp</dimen>
+    <dimen name="widget_scores_min_resize_width">180dp</dimen>
+    <dimen name="widget_scores_min_resize_height">@dimen/widget_scores_default_height</dimen>
+    <dimen name="widget_scores_large_width">320dp</dimen>
+</resources>
