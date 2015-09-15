@@ -32,6 +32,7 @@
                 android:gravity="center"
                 android:contentDescription="@string/home_team_name_description"
                 android:id="@+id/home_name"
+                android:textColor="@color/primary_text"
                 tools:text="home"
                 />
         </LinearLayout>
@@ -49,6 +50,7 @@
                 android:gravity="center"
                 android:textSize="@dimen/Score"
                 android:id="@+id/score_textview"
+                android:textColor="@color/primary_text"
                 tools:text="score"
                 />
             <TextView
@@ -58,8 +60,9 @@
                 android:contentDescription="@string/date_description"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:id="@+id/data_textview"
-                tools:text="data"
+                android:id="@+id/time_textview"
+                android:textColor="@color/secondary_text"
+                tools:text="13:00"
                 />
 
         </LinearLayout>
@@ -82,8 +85,9 @@
                 android:contentDescription="@string/away_team_name_description"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:textSize="@dimen/TeamNamesSmall"
+                android:textSize="@dimen/TeamNamesLarge"
                 android:id="@+id/away_name"
+                android:textColor="@color/primary_text"
                 tools:text="away"
                 />
         </LinearLayout>
