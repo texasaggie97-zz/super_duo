@@ -74,6 +74,9 @@ public class MainActivity extends ActionBarActivity {
         LOG.V(LOG_TAG, "selected id: " + savedInstanceState.getInt("Selected_match"));
         current_fragment = savedInstanceState.getInt("Pager_Current");
         selected_match_id = savedInstanceState.getInt("Selected_match");
+        if (my_main != null) {
+            my_main.restartLoaders();
+        }
         super.onRestoreInstanceState(savedInstanceState);
     }
 }
