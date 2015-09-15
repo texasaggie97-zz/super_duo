@@ -12,4 +12,11 @@
     <dimen name="Score">30sp</dimen>
     <dimen name="League">15sp</dimen>
     <dimen name="league_sel_height">50dp</dimen>
+
+    <!-- scores widget -->
+    <dimen name="widget_scores_default_width">294dp</dimen>
+    <dimen name="widget_scores_default_height">146dp</dimen>
+    <dimen name="widget_scores_min_resize_width">2200dp</dimen>
+    <dimen name="widget_scores_min_resize_height">@dimen/widget_scores_default_height</dimen>
+    <dimen name="widget_scores_large_width">368dp</dimen>
 </resources>

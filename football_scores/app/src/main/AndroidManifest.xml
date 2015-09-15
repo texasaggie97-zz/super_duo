@@ -44,6 +44,22 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.markesilva.footballscores.MainActivity" />
         </activity>
+
+        <receiver
+            android:name=".widget.ScoreWidgetProvider"
+            android:label="@string/title_scores_widget"
+            >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/widget_info_scores" />
+        </receiver>
+        <service android:name=".widget.ScoresWidgetRemoteViewsService"
+            android:enabled="true"
+            android:exported="false"
+            android:permission="android.permission.BIND_REMOTEVIEWS"
+            />
     </application>
 
 </manifest>
