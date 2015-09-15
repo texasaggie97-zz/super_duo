@@ -68,8 +68,8 @@ public class myFetchService extends IntentService {
                 }
             }
         });
-        getData("n2");
-        getData("p2");
+        getData("n3");
+        getData("p3");
 
         return;
     }
