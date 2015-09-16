@@ -1,52 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Football Scores</string>
+    <string name="app_name">サッカーのスコア</string>
     <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_settings">設定</string>
     <string name="test_text">Test</string>
-    <string name="today">Today</string>
-    <string name="yesterday">Yesterday</string>
-    <string name="tomorrow">Tomorrow</string>
-    <string name="matchday_text">Match day</string>
-    <string name="group_stage_text">Group stages</string>
-    <string name="first_knockout_round">First knockout round</string>
-    <string name="quarter_final">Quarter Final</string>
-    <string name="semi_final">Semi Final</string>
-    <string name="final_text">Final</string>
-    <string name="share_text">Share</string>
-    <string name="about">About</string>
-    <string name="title_activity_about">About Activity</string>
-    <string name="select_leagues">Select Leagues</string>
-    <string name="title_activity_league_selection">League Selection</string>
-    <string name="loading_data">Loading...</string>
-    <string name="okay_button_text">Okay</string>
-    <string name="cancel_button_text">Cancel</string>
+    <string name="today">今日</string>
+    <string name="yesterday">前日</string>
+    <string name="tomorrow">翌日</string>
+    <string name="matchday_text">対戦日</string>
+    <string name="group_stage_text">グループステージ</string>
+    <string name="first_knockout_round">最初のノックオフ ラウンド</string>
+    <string name="quarter_final">準々決勝</string>
+    <string name="semi_final">準決勝</string>
+    <string name="final_text">決勝</string>
+    <string name="share_text">共有</string>
+    <string name="about">情報</string>
+    <string name="title_activity_about">アクティビティの情報</string>
+    <string name="select_leagues">言語を選択</string>
+    <string name="title_activity_league_selection">リーグの選択</string>
+    <string name="loading_data">ロード中...</string>
+    <string name="okay_button_text">OK</string>
+    <string name="cancel_button_text">キャンセル</string>
     <string name="about_text">
-        This Application gets Soccer (Metric Football) Matches Scores for all leagues supported by football-data.org.
-        All Matches data are acquired from football-data.org free API.
-        All team Logos are downloaded from URLs provided by football-data.org.
-        The original version of this app was created by Yahia Khalid Ibn El Walid Ahmed, and a modified version is given to students in the Udacity Android Nanodegree program.
+        このアプリはfootball-data.orgでサポートされているサッカーリーグの対戦スコアを表示します。
+        対戦データはfootball-data.orgの無償APIから取得されています。
+        チームのロゴはfootball-data.orgが提供しているURLからダウンロードしています。
+        最初のバージョンのアプリは、Yahia Khalid Ibn El Walid Ahmed氏によって開発され、その後のバージョンはUdacity Android Nanodegree Programの学生に提供されています。
 
-        During the off season, fake data will be added to the app.
+        オフシーズン中に表示されるデータは正確ではありません。
     </string>
-    <string name="widget_text">Today\'s Metric Football Scores</string>
-    <string name="api_key" localizable="false"></string>
+    <string name="widget_text">今日のフットボール スコア</string>
+    <string name="api_key" localizable="false" translatable="false">51f0ddcdabc841d39aff52ccb0018b21</string>
     <string name="dummy_data" localizable="false" translatable="false">{\"timeFrameStart\":\"2015-06-18\",\"timeFrameEnd\":\"2015-06-19\",\"count\":1,\"fixtures\":[{\"_links\":{\"self\":{\"href\":\"http://api.football-data.org/alpha/fixtures/140514\"},\"soccerseason\":{\"href\":\"http://api.football-data.org/alpha/soccerseasons/357\"},\"homeTeam\":{\"href\":\"http://api.football-data.org/alpha/teams/275\"},\"awayTeam\":{\"href\":\"http://api.football-data.org/alpha/teams/263\"}},\"date\":\"2015-06-19T22:00:00Z\",\"status\":\"FINISHED\",\"matchday\":42,\"homeTeamName\":\"TESTING1\",\"awayTeamName\":\"TESTING2\",\"result\":{\"goalsHomeTeam\":2,\"goalsAwayTeam\":4}},{\"_links\":{\"self\":{\"href\":\"http://api.football-data.org/alpha/fixtures/140514\"},\"soccerseason\":{\"href\":\"http://api.football-data.org/alpha/soccerseasons/357\"},\"homeTeam\":{\"href\":\"http://api.football-data.org/alpha/teams/275\"},\"awayTeam\":{\"href\":\"http://api.football-data.org/alpha/teams/263\"}},\"date\":\"2015-06-19T22:00:00Z\",\"status\":\"FINISHED\",\"matchday\":42,\"homeTeamName\":\"TESTING1\",\"awayTeamName\":\"TESTING2\",\"result\":{\"goalsHomeTeam\":2,\"goalsAwayTeam\":4}},{\"_links\":{\"self\":{\"href\":\"http://api.football-data.org/alpha/fixtures/140514\"},\"soccerseason\":{\"href\":\"http://api.football-data.org/alpha/soccerseasons/357\"},\"homeTeam\":{\"href\":\"http://api.football-data.org/alpha/teams/275\"},\"awayTeam\":{\"href\":\"http://api.football-data.org/alpha/teams/263\"}},\"date\":\"2015-06-19T22:00:00Z\",\"status\":\"FINISHED\",\"matchday\":42,\"homeTeamName\":\"TESTING1\",\"awayTeamName\":\"TESTING2\",\"result\":{\"goalsHomeTeam\":2,\"goalsAwayTeam\":4}},{\"_links\":{\"self\":{\"href\":\"http://api.football-data.org/alpha/fixtures/140514\"},\"soccerseason\":{\"href\":\"http://api.football-data.org/alpha/soccerseasons/357\"},\"homeTeam\":{\"href\":\"http://api.football-data.org/alpha/teams/275\"},\"awayTeam\":{\"href\":\"http://api.football-data.org/alpha/teams/263\"}},\"date\":\"2015-06-19T22:00:00Z\",\"status\":\"FINISHED\",\"matchday\":42,\"homeTeamName\":\"TESTING1\",\"awayTeamName\":\"TESTING2\",\"result\":{\"goalsHomeTeam\":2,\"goalsAwayTeam\":4}},{\"_links\":{\"self\":{\"href\":\"http://api.football-data.org/alpha/fixtures/140514\"},\"soccerseason\":{\"href\":\"http://api.football-data.org/alpha/soccerseasons/357\"},\"homeTeam\":{\"href\":\"http://api.football-data.org/alpha/teams/275\"},\"awayTeam\":{\"href\":\"http://api.football-data.org/alpha/teams/263\"}},\"date\":\"2015-06-19T22:00:00Z\",\"status\":\"FINISHED\",\"matchday\":42,\"homeTeamName\":\"TESTING1\",\"awayTeamName\":\"TESTING2\",\"result\":{\"goalsHomeTeam\":2,\"goalsAwayTeam\":4}}]}</string>
 
     <!-- default content descriptions -->
-    <string name="home_crest_description">Home Team Crest</string>
-    <string name="home_team_name_description">Home Team Name</string>
-    <string name="away_crest_description">Away Team Crest</string>
-    <string name="away_team_name_description">Away Team Name</string>
-    <string name="score_description">Score</string>
-    <string name="league_description">League name</string>
-    <string name="matchday_description">Matchday</string>
-    <string name="date_description">Game Time</string>
+    <string name="home_crest_description">ホームチームのクレスト</string>
+    <string name="home_team_name_description">ホームチーム名</string>
+    <string name="away_crest_description">アウェイチームのクレスト</string>
+    <string name="away_team_name_description">アウェイチーム名</string>
+    <string name="score_description">スコア</string>
+    <string name="league_description">リーグ名</string>
+    <string name="matchday_description">対戦日</string>
+    <string name="date_description">試合時間</string>
     <!-- content description building strings -->
-    <string name="crest_description"> crest</string>
+    <string name="crest_description">クレスト</string>
 
     <!-- widgets -->
-    <string name="title_scores_widget">Today\'s scores</string>
+    <string name="title_scores_widget">今日のスコア</string>
 
 </resources>

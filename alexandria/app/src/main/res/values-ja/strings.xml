@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Alexandria</string>
+
+    <!-- Menu Items -->
+    <string name="books">書籍のリスト</string>
+    <string name="scan">書籍をスキャン/追加</string>
+    <string name="about">このアプリの情報</string>
+
+    <string name="navigation_drawer_open" >ナビゲーションドロワーを開く</string>
+    <string name="navigation_drawer_close">ナビゲーションドロワーを閉じる</string>
+    <string name="action_settings">設定</string>
+    <string name="scan_button">スキャン</string>
+    <string name="input_hint">ISBN-13を入力してください（数字のみ）。</string>
+    <string name="book_cover">書籍の表紙</string>
+
+    <string name="ok_button">次</string>
+    <string name="cancel_button">キャンセル</string>
+    <string name="not_found">書籍は見つかりませんでした</string>
+    <string name="search">検索</string>
+    <string name="delete">書籍を削除</string>
+    <string name="pref_startScreen">起動画面を選択</string>
+    <string name="title_activity_settings">設定</string>
+    <string name="action_share">共有</string>
+    <string name="back_button">戻る</string>
+    <string name="share_text">おすすめの書籍: </string>
+
+    <string name="no_network_description">[書籍を追加]機能を使用するにはインターネットが必要です</string>
+    <string name="empty_book_list">書籍が入力されませんでした。[書籍をスキャン/追加]を使用してこのリストに書籍を追加します</string>
+
+    <string name="about_text">このアプリで表示される書籍の題名、表紙の画像、著者に関する書籍情報はすべてGoogle APIから取得しています。このアプリの最初のバージョンはSascha Jaschke氏によって開発されました。</string>
+</resources>
